@@ -1,2 +1,2 @@
-# CreaTeam-ComputerSecurity
+# KreaTeam-ComputerSecurity
 BME VIK Computer Security Homework
