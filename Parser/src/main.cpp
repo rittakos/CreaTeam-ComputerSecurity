@@ -3,9 +3,9 @@
 #include "bitmap.h"
 #include "error.h"
 
-#include <crtdbg.h>
-
-#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
+//
+//#define _CRTDBG_MAP_ALLOC
 
 
 void readCaff(std::string filePath, std::string mode, std::string out = "")
