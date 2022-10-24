@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 		else
 			err.writeErrorMessage(std::cout);
 	}
-	else if (argv[2] == "data")
+	else if (argv[2] == std::string("data"))
 	{
 		std::string data = caff.dataToString();
 		std::cout << data;

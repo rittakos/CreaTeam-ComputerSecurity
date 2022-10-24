@@ -21,19 +21,17 @@ public:
 	} header;
 
 	std::vector<Pixel> pixels;
+
 private:
 	bool valid;
-
 	unsigned long int blockSize;
 
+	Error readBlocks(std::shared_ptr<std::ifstream> is, unsigned long int size);
 public:
 
 	Error read(std::shared_ptr<std::ifstream> is, unsigned long int size);
-
 	bool isValid() const { return valid; }
 
-	Ciff() {}
+	Ciff() = default;
 	~Ciff();
-
-	//friend void Bitmap::generateBMP(std::ofstream& os, const Ciff& ciff);
 };

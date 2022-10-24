@@ -127,7 +127,7 @@ std::optional<T> readBits(std::shared_ptr<std::istream> is, size_t size)
 
 		success = convert(result, input, size);
 	}
-	catch (std::exception)
+	catch (...)
 	{
 		std::cout << "Problem while reading!" << std::endl;
 		return {};

@@ -12,7 +12,8 @@ enum ErrorType{	OK,
 				CAFFCreditsError,
 				CAFFAnimationError,
 				CIFFError,
-				ByteReadError};
+				ByteReadError,
+				UnhandledException};
 
 class Error
 {

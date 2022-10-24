@@ -9,6 +9,7 @@ bool Caff::isPathValid(std::string path) const
 
 Error Caff::readFile()
 {
+	
 	while (allReadBytes < fileSize)
 	{
 		std::optional<CaffBlockId> id = readBits<CaffBlockId>(is, 1);
@@ -56,6 +57,7 @@ Error Caff::readFile()
 		allReadBytes += length.value();
 	}
 
+	setData();
 	return ErrorType::OK;
 }
 
@@ -212,6 +214,21 @@ Error Caff::readAnimation(unsigned long int size)
 	return ErrorType::OK;
 }
 
+void Caff::setData()
+{
+	data.filePath = this->path;
+	data.creator = credits.creator;
+	data.animCount = header.animCount;
+	data.duration = 0;
+	for (AnimationBlock a : animations)
+		data.duration += a.duration;
+	if (data.animCount > 0)
+	{
+		data.width = animations[0].ciff.header.width;
+		data.height = animations[0].ciff.header.height;
+	}
+}
+
 Error Caff::load(std::string path)
 {
 	if (!isPathValid(path))
@@ -240,7 +257,11 @@ Error Caff::load(std::string path)
 
 std::string Caff::dataToString() const
 {
-	return std::string();
+	std::string result = "";
+	
+	data.write(std::cout);
+
+	return result;
 }
 
 
@@ -248,4 +269,13 @@ Caff::~Caff()
 {
 	if (is != nullptr && is->is_open())
 		is->close();
+}
+
+void Data::write(std::ostream& os) const
+{
+	os << "Path: " << this->filePath << std::endl;
+	os << "Creator: " << creator << std::endl;
+	os << "W: " << width << "\t H: " << height << std::endl;
+	os << "Duration: " << duration << std::endl;
+	os << "Animations: " << animCount << std::endl;
 }

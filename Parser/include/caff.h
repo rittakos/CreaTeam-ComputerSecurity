@@ -14,6 +14,20 @@ struct AnimationBlock
 	AnimationBlock() = default;
 };
 
+struct Data
+{
+	std::string filePath;
+	std::string creator;
+	std::string creationTime;
+	int animCount;
+	int duration;
+	int width;
+	int height;
+
+	void write(std::ostream& os) const;
+};
+
+
 enum CaffBlockId {Header, Credits, Animation, Invalid};
 
 class Caff
@@ -52,6 +66,10 @@ class Caff
 	Error readAnimation(unsigned long int size);
 
 	unsigned long long int allReadBytes = 0;
+
+	Data data;
+
+	void setData();
 
 public:
 	

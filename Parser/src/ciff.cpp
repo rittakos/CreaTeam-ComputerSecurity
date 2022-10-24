@@ -3,7 +3,7 @@
 #include <optional>
 #include <iostream>
 
-Error Ciff::read(std::shared_ptr<std::ifstream> is, unsigned long int size)
+Error Ciff::readBlocks(std::shared_ptr<std::ifstream> is, unsigned long int size)
 {
 	unsigned long int alreadyRead = 0;
 
@@ -127,6 +127,21 @@ Error Ciff::read(std::shared_ptr<std::ifstream> is, unsigned long int size)
 		return Error(ErrorType::CIFFError, "Incorrect number of bytes has been read!");
 
 	return ErrorType::OK;
+}
+
+Error Ciff::read(std::shared_ptr<std::ifstream> is, unsigned long int size)
+{
+	try
+	{
+		Error result = readBlocks(is, size);
+		valid = result == OK;
+		
+		return result;
+	}
+	catch (...)
+	{
+		return Error(ErrorType::UnhandledException, "CIFF read");
+	}
 }
 
 
