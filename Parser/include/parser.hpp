@@ -126,6 +126,8 @@ std::optional<T> readBits(std::shared_ptr<std::istream> is, size_t size)
 		is->read(input, size);
 
 		success = convert(result, input, size);
+
+		delete[] input;
 	}
 	catch (...)
 	{
