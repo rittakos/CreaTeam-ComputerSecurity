@@ -38,7 +38,10 @@ void readCaff(std::string filePath, std::string mode, std::string out = "")
 
 int main(int argc, char* argv[])
 {
-	readCaff(argv[1], argv[2], argv[3]);
+	if(argc == 4)
+		readCaff(argv[1], argv[2], argv[3]);
+	else if (argc == 3)
+		readCaff(argv[1], argv[2]);
 
 	//_CrtDumpMemoryLeaks();
 
