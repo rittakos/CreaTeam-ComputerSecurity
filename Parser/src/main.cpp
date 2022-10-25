@@ -44,7 +44,10 @@ void processCaff(std::string filePath, Mode mode, std::string out = "")
 	Error succes = caff.load(filePath);
 
 	if (succes != ErrorType::OK)
+	{
 		succes.writeErrorMessage(std::cout);
+		return;
+	}
 	else
 		std::cout << "CAFF File has been read succesfully!" << std::endl;
 

@@ -240,7 +240,8 @@ Error Caff::load(std::string path)
 	}
 	catch (...)
 	{
-		is->close();
+		if(is != nullptr && is->is_open())
+			is->close();
 		return ErrorType::FileOpenError;
 	}
 
