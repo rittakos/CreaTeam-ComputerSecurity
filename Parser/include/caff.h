@@ -28,8 +28,6 @@ struct Data
 };
 
 
-enum CaffBlockId {Header, Credits, Animation, Invalid};
-
 class Caff
 {
 	std::string						path;
@@ -57,7 +55,6 @@ class Caff
 
 	unsigned long long fileSize = 0;
 
-	bool isPathValid(std::string path) const;
 	Error readFile();
 	void reset();
 

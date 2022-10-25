@@ -1,4 +1,7 @@
-#pragma once
+#ifndef CIFF_H
+#define CIFF_H
+
+
 #include <string>
 #include <vector>
 #include "pixel.h"
@@ -35,3 +38,5 @@ public:
 	Ciff() = default;
 	~Ciff();
 };
+
+#endif

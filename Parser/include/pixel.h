@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef PIXEL_H
+#define PIXEL_H
 
 struct Pixel
 {
@@ -20,3 +20,5 @@ struct Pixel
 		return true;
 	}
 };
+
+#endif

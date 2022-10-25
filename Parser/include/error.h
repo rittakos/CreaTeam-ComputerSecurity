@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ERROR_H
+#define ERROR_H
+
 #include <ostream>
 #include <map>
 #include <optional>
@@ -13,7 +15,8 @@ enum ErrorType{	OK,
 				CAFFAnimationError,
 				CIFFError,
 				ByteReadError,
-				UnhandledException};
+				UnhandledException,
+				InvalidParameter};
 
 class Error
 {
@@ -30,6 +33,8 @@ class Error
 							{ErrorType::CAFFAnimationError, "Error while reading CAFF animation!"},
 							{ErrorType::CIFFError,			"Error while reading CIFF!"},
 							{ErrorType::ByteReadError,		"Error while reading Bytes!"},
+							{ErrorType::UnhandledException,	"Unhandled exception!"},
+							{ErrorType::InvalidParameter,	"Invalid input parameter!"}
 						};
 	std::optional<std::string> massage;
 public:
@@ -67,3 +72,5 @@ public:
 			os << "  -  " << massage.value() << std::endl;
 	}
 };
+
+#endif

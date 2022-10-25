@@ -1,4 +1,7 @@
-#pragma once
+#ifndef BITMAP_H
+#define BITMAP_H
+
+
 #include <cstdint>
 #include <fstream>
 
@@ -77,3 +80,5 @@ public:
         return OK;
     }
 };
+
+#endif

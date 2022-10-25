@@ -1,11 +1,6 @@
+#include <filesystem>
 #include "caff.h"
 #include "parser.hpp"
-#include <filesystem>
-
-bool Caff::isPathValid(std::string path) const
-{
-	return true;
-}
 
 Error Caff::readFile()
 {
@@ -231,8 +226,9 @@ void Caff::setData()
 
 Error Caff::load(std::string path)
 {
-	if (!isPathValid(path))
-		return ErrorType::InvalidPath;
+	Error pathErr = checkExtension(path, "caff");
+	if (pathErr != OK)
+		return pathErr;
 	
 	this->path = path;
 
@@ -253,6 +249,7 @@ Error Caff::load(std::string path)
 	is->close();
 
 	return success;
+
 }
 
 std::string Caff::dataToString() const

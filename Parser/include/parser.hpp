@@ -1,8 +1,33 @@
-#pragma once
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <iostream>
 #include <optional>
-#include "caff.h"
+#include <fstream>
+#include <memory>
+#include "pixel.h"
+
+enum CaffBlockId { Header, Credits, Animation, Invalid };
+
+static Error checkExtension(std::string path, std::string extension)
+{
+	std::string delimiter = ".";
+	std::vector<std::string> parts;
+
+	size_t pos = 0;
+	std::string part;
+	while ((pos = path.find(delimiter)) != std::string::npos) {
+		part = path.substr(0, pos);
+		parts.push_back(part);
+		path.erase(0, pos + delimiter.length());
+	}
+	parts.push_back(path);
+
+	if (path == extension)
+		return OK;
+
+	return Error(InvalidPath, "Bad extension!");
+}
 
 static bool convert(CaffBlockId& result, char* from, size_t size)
 {
@@ -26,7 +51,6 @@ static bool convert(CaffBlockId& result, char* from, size_t size)
 	return true;
 }
 
-
 static bool convert(unsigned long int& result, char* from, size_t size)
 {
 	if (from == nullptr || size > 8)
@@ -43,7 +67,6 @@ static bool convert(unsigned long int& result, char* from, size_t size)
 
 	return true;
 }
-
 
 static bool convert(int& result, char* from, size_t size)
 {
@@ -62,7 +85,6 @@ static bool convert(int& result, char* from, size_t size)
 	return true;
 }
 
-
 static bool convert(std::string& result, char* from, size_t size)
 {
 	if (from == nullptr)
@@ -77,7 +99,6 @@ static bool convert(std::string& result, char* from, size_t size)
 
 	return true;
 }
-
 
 static bool convert(char& result, char* from, size_t size)
 {
@@ -115,7 +136,7 @@ concept Readable =	std::same_as<T, CaffBlockId> ||
 
 
 template<Readable T>
-std::optional<T> readBits(std::shared_ptr<std::istream> is, size_t size)
+std::optional<T> readBits(std::shared_ptr<std::ifstream> is, int size)
 {
 	T result;
 	bool success;
@@ -140,3 +161,5 @@ std::optional<T> readBits(std::shared_ptr<std::istream> is, size_t size)
 
 	return result;
 }
+
+#endif
