@@ -9,4 +9,4 @@ mkdir -p aflbuild \
 && cd aflbuild \
 && cmake .. \
 && make \
-&& $AFL/afl-fuzz -m $Size -i $Project/ExampleFiles -o $Project/Parser/findings $Project/Parser/parser @@
+&& $AFL/afl-fuzz -m $Size -i $Project/ExampleFiles -o $Project/Parser/findings $Project/Parser/aflbuild/parser @@
