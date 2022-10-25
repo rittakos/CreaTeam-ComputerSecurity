@@ -74,7 +74,9 @@ void processCaff(std::string filePath, Mode mode, std::string out = "")
 int main(int argc, char* argv[])
 {
 	Mode mode = None;
-	if (argv[2] == std::string("data"))
+	if (argc < 3)
+		mode = None;
+	else if (argv[2] == std::string("data"))
 		mode = Data;
 	else if (argv[2] == std::string("preview"))
 		mode = Preview;
