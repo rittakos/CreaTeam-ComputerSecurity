@@ -3,31 +3,12 @@ info:
   title: openapi
   version: '1.0'
   description: Caff webshop API
+  contact:
+    name: KreaTeam
+    url: 'https://github.com/rittakos/KreaTeam-ComputerSecurity'
 servers:
-  - url: 'http://localhost:8080/api'
+  - url: 'http://localhost:8080'
 paths:
-  /auth/register:
-    post:
-      summary: ''
-      operationId: post-auth-register
-      description: registration api
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegistrationRequest'
-          application/xml:
-            schema:
-              type: object
-              properties: {}
-        description: ''
-      tags:
-        - auth
   /auth/login:
     post:
       summary: ''
@@ -52,7 +33,67 @@ paths:
               properties: {}
       tags:
         - auth
-      description: Login API
+      description: login api
+    parameters: []
+  /auth/login/refresh:
+    post:
+      summary: ''
+      operationId: post-auth-login-refresh
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewTokenResponse'
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      description: refresh login api
+      tags:
+        - auth
+  /auth/logout:
+    post:
+      summary: ''
+      operationId: post-auth-logout
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      description: logout api
+      tags:
+        - auth
+  /auth/register:
+    post:
+      summary: ''
+      operationId: post-auth-register
+      description: registration api
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+      tags:
+        - auth
+    parameters: []
 components:
   schemas:
     RegistrationRequest:
@@ -116,5 +157,24 @@ components:
         - accessToken
         - refreshToken
         - userDetails
+    RefreshTokenRequest:
+      title: RefreshTokenRequest
+      type: object
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+    NewTokenResponse:
+      title: NewTokenResponse
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - accessToken
+        - refreshToken
 tags:
   - name: auth
