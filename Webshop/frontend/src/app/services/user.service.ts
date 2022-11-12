@@ -5,6 +5,7 @@ import { LoginResponse, NewTokenResponse, UserDetailsResponse } from '../api/web
 import { AuthService } from '../api/webshop/services';
 
 const TOKEN_KEY = 'tokens';
+const ADMIN = 'ROLE_ADMIN';
 
 type TokenPayload = UserDetailsResponse & {
   exp: number;
@@ -16,6 +17,7 @@ type TokenPayload = UserDetailsResponse & {
 export class UserService {
   private tokens?: NewTokenResponse;
   private loggedIn: ReplaySubject<boolean> = new ReplaySubject();
+  private admin: ReplaySubject<boolean> = new ReplaySubject();
 
   constructor(
     private readonly router: Router,
@@ -48,6 +50,7 @@ export class UserService {
       response.subscribe({
         next: res => {
           this.setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+          this.setRoles(res.accessToken);
           this.router.navigate(['/']);
           subscriber.next(res);
         },
@@ -58,6 +61,10 @@ export class UserService {
 
   isLoggedIn(): Observable<boolean> {
     return this.loggedIn.asObservable();
+  }
+
+  isAdmin(): Observable<boolean> {
+    return this.admin.asObservable();
   }
 
   register(name: string, username: string, email: string, password: string, confirmPassword: string): Observable<void> {
@@ -97,6 +104,7 @@ export class UserService {
     this.authService.postAuthLoginRefresh({ body: { refreshToken } }).subscribe({
       next: res => {
         this.setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+        this.setRoles(res.accessToken);
       },
       error: err => {
         console.error(err);
@@ -112,10 +120,15 @@ export class UserService {
   }
 
   private isExpired(token: string): boolean {
-    const payload = token.split('.')[1];
-    const parsed = JSON.parse(window.atob(payload));
-    const expiration = parsed.exp * 1000;
+    const payload = this.getTokenPayload(token);
+    const expiration = payload.exp * 1000;
     return new Date(expiration) < new Date();
+  }
+
+  private setRoles(token: string) {
+    const payload = this.getTokenPayload(token);
+    const hasAdminRole = payload.roles.some(r => r === ADMIN);
+    this.admin.next(hasAdminRole);
   }
 
 }

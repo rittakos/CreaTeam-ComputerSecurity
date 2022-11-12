@@ -4,6 +4,7 @@ import { AccessGuard } from './access-guard';
 import { AuthComponent } from './components/auth/auth.component';
 import { HomeComponent } from './components/home/home.component';
 
+// add requiresAdmin: true into the data object instead of requiresLogin if admin role required
 const routes: Routes = [
   { path: '', component: HomeComponent, data: { requiresLogin: true, redirectTo: '/auth' }, canActivate: [ AccessGuard ] },
   { path: 'auth', component: AuthComponent, data: { requiresLogout: true, redirectTo: '/' }, canActivate: [ AccessGuard ], runGuardsAndResolvers: 'always' },
