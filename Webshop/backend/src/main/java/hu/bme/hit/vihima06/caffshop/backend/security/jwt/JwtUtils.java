@@ -56,6 +56,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setSubject((userDetails.getUsername()))
+                .claim(ID, userDetails.getId())
                 .setIssuedAt(new Date())
                 .claim("type", "refresh")
                 .setExpiration(new Date((new Date()).getTime() + jwtRefreshExpirationMs))
@@ -90,6 +91,10 @@ public class JwtUtils {
 
     public Date getRefreshTokenExpiration(String token) {
         return Jwts.parser().setSigningKey(jwtRefreshSecret).parseClaimsJws(token).getBody().getExpiration();
+    }
+
+    public Integer getRefreshTokenUserId(String token) {
+        return Jwts.parser().setSigningKey(jwtRefreshSecret).parseClaimsJws(token).getBody().get(ID, Integer.class);
     }
 
     private boolean validateToken(String token, String secret) {

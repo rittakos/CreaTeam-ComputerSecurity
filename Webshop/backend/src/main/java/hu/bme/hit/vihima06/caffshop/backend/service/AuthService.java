@@ -94,7 +94,8 @@ public class AuthService {
         }
 
         String hashOfJwtToken = getHashOfJwtToken(refreshToken);
-        Optional<RefreshToken> storedToken = refreshTokenRepository.findFirstByTokenHash(hashOfJwtToken);
+        Integer userId = jwtUtils.getRefreshTokenUserId(refreshToken);
+        Optional<RefreshToken> storedToken = refreshTokenRepository.findFirstByTokenHashAndUserId(hashOfJwtToken, userId);
 
         if (storedToken.isEmpty()) {
             throw new UnauthorizedException("Wrong refresh token");

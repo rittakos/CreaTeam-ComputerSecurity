@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Integer> {
-    Optional<RefreshToken> findFirstByTokenHash(String tokenHash);
+    Optional<RefreshToken> findFirstByTokenHashAndUserId(String tokenHash, Integer userId);
     List<RefreshToken> findByExpirationLessThan(Date expiration);
     @Modifying
     @Query("delete from RefreshToken r where r.tokenHash = :tokenHash")
