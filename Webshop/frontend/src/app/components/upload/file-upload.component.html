@@ -1,0 +1,18 @@
+<div id="file-upload-container">
+    <h1>File uploading</h1>
+    <form (ngSubmit)="onUpload()">
+        <label>File name</label>
+        <input placeholder="File name" name="fileName" [(ngModel)]="fileName">
+
+        <label>Upload file from your device</label>
+        <input id="file-upload-input" type="file" (change)="onFileSelected($event)" style="display: none;" #fileInput>
+        <button id="file-select-btn" (click)="fileInput.click()">Select file</button>
+        <h2>Selected file: </h2>
+        <h2 id="uploading-file"></h2>
+
+        <label>Price of File</label>
+        <input placeholder="0" type="number" name="price" [(ngModel)]="price">
+    
+        <button type="submit">Upload file</button>
+    </form>
+</div>

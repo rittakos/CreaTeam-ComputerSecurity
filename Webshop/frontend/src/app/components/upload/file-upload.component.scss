@@ -1,13 +1,24 @@
 $base-green: #B2E95D;
 $base-darker-green: #91BE4C;
 
-#register-container {
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+#file-upload-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    
 
 
     form {
@@ -43,6 +54,16 @@ $base-darker-green: #91BE4C;
 
         button:hover {
             background-color: $base-darker-green;
+        }
+
+        h2 {
+            font-size: 0.80rem;
+            max-width: fit-content;
+            flex-wrap: wrap;
+        }
+
+        #file-select-btn {
+            margin-top: 0rem;
         }
 
     }
