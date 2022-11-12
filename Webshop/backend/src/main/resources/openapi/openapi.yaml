@@ -1,0 +1,440 @@
+openapi: 3.0.0
+info:
+  title: openapi
+  version: '1.0'
+  description: Caff webshop API
+  contact:
+    name: KreaTeam
+    url: 'https://github.com/rittakos/KreaTeam-ComputerSecurity'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /auth/login:
+    post:
+      summary: ''
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      tags:
+        - auth
+      description: login api
+    parameters: []
+  /auth/login/refresh:
+    post:
+      summary: ''
+      operationId: post-auth-login-refresh
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewTokenResponse'
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      description: refresh login api
+      tags:
+        - auth
+  /auth/logout:
+    post:
+      summary: ''
+      operationId: post-auth-logout
+      responses:
+        '204':
+          description: No Content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      description: logout api
+      tags:
+        - auth
+  /auth/register:
+    post:
+      summary: ''
+      operationId: post-auth-register
+      description: registration api
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+        description: ''
+      tags:
+        - auth
+    parameters: []
+  /files/search:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - files
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaffResponse'
+      operationId: get-files-search
+      description: search for caff files
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: query
+  '/files/delete/{id}':
+    delete:
+      summary: ''
+      operationId: delete-files-delete
+      responses:
+        '204':
+          description: No Content
+      description: delete an uploaded caff file
+      tags:
+        - files
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  '/files/comment/{fileId}':
+    parameters:
+      - schema:
+          type: integer
+        name: fileId
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-files-comment-fileId
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Bad Request
+      description: create a new coment on a file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      tags:
+        - files
+        - comment
+  '/files/details/{id}':
+    get:
+      summary: Your GET endpoint
+      tags:
+        - files
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaffDetailsResponse'
+      operationId: get-file-details
+      description: get the caff file details
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  '/files/modify/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+    put:
+      summary: ''
+      operationId: post-files-modify-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaffDetailsResponse'
+        '400':
+          description: Bad Request
+      description: modify the details of a caff file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyCaffRequest'
+      tags:
+        - files
+  /admin/modifyUser:
+    put:
+      summary: ''
+      operationId: put-admin-modifyUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          description: Bad Request
+      description: modify details of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyUserRequest'
+      tags:
+        - admin
+components:
+  schemas:
+    RegistrationRequest:
+      title: RegistrationRequest
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+      required:
+        - name
+        - username
+        - email
+        - password
+        - confirmPassword
+    LoginRequest:
+      title: LoginRequest
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    LoginResponse:
+      title: LoginResponse
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        userDetails:
+          $ref: '#/components/schemas/UserDetailsResponse'
+      required:
+        - accessToken
+        - refreshToken
+        - userDetails
+    RefreshTokenRequest:
+      title: RefreshTokenRequest
+      type: object
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+    NewTokenResponse:
+      title: NewTokenResponse
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+    CaffResponse:
+      title: CaffResponse
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        uploadDate:
+          type: string
+          format: date-time
+        price:
+          type: number
+      required:
+        - id
+        - name
+        - uploadDate
+        - price
+    CaffDetailsResponse:
+      title: CaffDetailsResponse
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        uploadDate:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        size:
+          type: object
+          required:
+            - width
+            - height
+          properties:
+            width:
+              type: integer
+            height:
+              type: integer
+        price:
+          type: number
+        creator:
+          $ref: '#/components/schemas/PublicUserDetailsResponse'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+      required:
+        - id
+        - name
+        - uploadDate
+        - tags
+        - description
+        - size
+        - price
+        - creator
+        - comments
+    PublicUserDetailsResponse:
+      title: PublicUserDetailsResponse
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        username:
+          type: string
+      required:
+        - id
+        - name
+        - username
+    CommentRequest:
+      title: CommentRequest
+      type: object
+      properties:
+        comment:
+          type: string
+      required:
+        - comment
+    CommentResponse:
+      title: CommentResponse
+      type: object
+      properties:
+        id:
+          type: integer
+        comment:
+          type: string
+        user:
+          $ref: '#/components/schemas/PublicUserDetailsResponse'
+        date:
+          type: string
+          format: date-time
+      required:
+        - id
+        - comment
+        - user
+        - date
+    ModifyCaffRequest:
+      title: ModifyCaffRequest
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    ModifyUserRequest:
+      title: ModifyUserRequest
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - email
+        - roles
+    UserDetailsResponse:
+      title: UserDetailsResponse
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - username
+        - email
+        - roles
+tags:
+  - name: admin
+  - name: auth
+  - name: comment
+  - name: files
