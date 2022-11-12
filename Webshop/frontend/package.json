@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "openapi:codegen": "ng-openapi-gen --input  ../backend/src/main/resources/openapi/openapi.yaml --output src/app/api"
+    "openapi:codegen": "ng-openapi-gen --input  ../backend/src/main/resources/openapi/openapi.yaml --output src/app/api/webshop"
   },
   "private": true,
   "dependencies": {

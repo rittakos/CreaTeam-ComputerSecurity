@@ -151,7 +151,7 @@ paths:
       tags:
         - files
         - comment
-  '/file/details/{id}':
+  '/files/details/{id}':
     get:
       summary: Your GET endpoint
       tags:

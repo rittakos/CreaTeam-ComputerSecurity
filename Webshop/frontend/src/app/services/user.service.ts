@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, ReplaySubject } from 'rxjs';
-import { LoginResponse, NewTokenResponse, UserDetailsResponse } from '../api/models';
-import { AuthService } from '../api/services';
+import { LoginResponse, NewTokenResponse, UserDetailsResponse } from '../api/webshop/models';
+import { AuthService } from '../api/webshop/services';
 
 const TOKEN_KEY = 'tokens';
 

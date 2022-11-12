@@ -201,7 +201,7 @@ export class FilesService extends BaseService {
   /**
    * Path part for operation getFileDetails
    */
-  static readonly GetFileDetailsPath = '/file/details/{id}';
+  static readonly GetFileDetailsPath = '/files/details/{id}';
 
   /**
    * Your GET endpoint.
