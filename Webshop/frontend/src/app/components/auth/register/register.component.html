@@ -1,0 +1,25 @@
+<div>
+  <form (ngSubmit)="onRegister()">
+      <div class="w-100">
+          <label>Name</label>
+          <input placeholder="Name" name="name" [(ngModel)]="name">
+      </div>
+      <div class="w-100">
+          <label>Username</label>
+          <input placeholder="Username" name="username" [(ngModel)]="username">
+      </div>
+      <div class="w-100">
+          <label>Email</label>
+          <input placeholder="Email" name="email" [(ngModel)]="email">
+      </div>
+      <div class="w-100">
+          <label>Password</label>
+          <input type="password" placeholder="Password" name="password" [(ngModel)]="password">
+      </div>
+      <div class="w-100">
+          <label>Confirm password</label>
+          <input type="password" placeholder="Password" name="confirmPassword" [(ngModel)]="confirmPassword">
+      </div>
+      <button type="submit">Register</button>
+  </form>
+</div>

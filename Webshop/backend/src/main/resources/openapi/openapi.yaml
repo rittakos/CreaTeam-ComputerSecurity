@@ -27,10 +27,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
-          application/xml:
-            schema:
-              type: object
-              properties: {}
       tags:
         - auth
       description: login api
@@ -86,10 +82,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegistrationRequest'
-          application/xml:
-            schema:
-              type: object
-              properties: {}
         description: ''
       tags:
         - auth
