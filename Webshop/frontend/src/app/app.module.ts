@@ -3,7 +3,7 @@ import { forwardRef, NgModule, Provider } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { ApiInterceptor } from './api/api-interceptor';
-import { ApiModule } from './api/api.module';
+import { ApiModule } from './api/webshop/api.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
