@@ -13,6 +13,8 @@ import { CaffDetailsResponse } from '../models/caff-details-response';
 import { CaffResponse } from '../models/caff-response';
 import { CommentRequest } from '../models/comment-request';
 import { CommentResponse } from '../models/comment-response';
+import { FileUploadRequest } from '../models/file-upload-request';
+import { FileUploadResponse } from '../models/file-upload-response';
 import { ModifyCaffRequest } from '../models/modify-caff-request';
 
 @Injectable({
@@ -312,6 +314,179 @@ export class FilesService extends BaseService {
 
     return this.postFilesModifyId$Response(params).pipe(
       map((r: StrictHttpResponse<CaffDetailsResponse>) => r.body as CaffDetailsResponse)
+    );
+  }
+
+  /**
+   * Path part for operation getFilesPreview
+   */
+  static readonly GetFilesPreviewPath = '/files/preview/{id}';
+
+  /**
+   * Your GET endpoint.
+   *
+   * file preview download
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getFilesPreview()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getFilesPreview$Response(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<StrictHttpResponse<Blob>> {
+
+    const rb = new RequestBuilder(this.rootUrl, FilesService.GetFilesPreviewPath, 'get');
+    if (params) {
+      rb.path('id', params.id, {});
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'blob',
+      accept: 'image/bmp',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return r as StrictHttpResponse<Blob>;
+      })
+    );
+  }
+
+  /**
+   * Your GET endpoint.
+   *
+   * file preview download
+   *
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `getFilesPreview$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getFilesPreview(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<Blob> {
+
+    return this.getFilesPreview$Response(params).pipe(
+      map((r: StrictHttpResponse<Blob>) => r.body as Blob)
+    );
+  }
+
+  /**
+   * Path part for operation getFilesDownload
+   */
+  static readonly GetFilesDownloadPath = '/files/download/{id}';
+
+  /**
+   * Your GET endpoint.
+   *
+   * download a caff file
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getFilesDownload()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getFilesDownload$Response(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<StrictHttpResponse<Blob>> {
+
+    const rb = new RequestBuilder(this.rootUrl, FilesService.GetFilesDownloadPath, 'get');
+    if (params) {
+      rb.path('id', params.id, {});
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'blob',
+      accept: 'application/octet-stream',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return r as StrictHttpResponse<Blob>;
+      })
+    );
+  }
+
+  /**
+   * Your GET endpoint.
+   *
+   * download a caff file
+   *
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `getFilesDownload$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getFilesDownload(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<Blob> {
+
+    return this.getFilesDownload$Response(params).pipe(
+      map((r: StrictHttpResponse<Blob>) => r.body as Blob)
+    );
+  }
+
+  /**
+   * Path part for operation postFilesUpload
+   */
+  static readonly PostFilesUploadPath = '/files/upload';
+
+  /**
+   * upoad caff file
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `postFilesUpload()` instead.
+   *
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
+   */
+  postFilesUpload$Response(params?: {
+    context?: HttpContext
+    body?: FileUploadRequest
+  }
+): Observable<StrictHttpResponse<FileUploadResponse>> {
+
+    const rb = new RequestBuilder(this.rootUrl, FilesService.PostFilesUploadPath, 'post');
+    if (params) {
+      rb.body(params.body, 'multipart/form-data');
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'json',
+      accept: 'application/json',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return r as StrictHttpResponse<FileUploadResponse>;
+      })
+    );
+  }
+
+  /**
+   * upoad caff file
+   *
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `postFilesUpload$Response()` instead.
+   *
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
+   */
+  postFilesUpload(params?: {
+    context?: HttpContext
+    body?: FileUploadRequest
+  }
+): Observable<FileUploadResponse> {
+
+    return this.postFilesUpload$Response(params).pipe(
+      map((r: StrictHttpResponse<FileUploadResponse>) => r.body as FileUploadResponse)
     );
   }
 
