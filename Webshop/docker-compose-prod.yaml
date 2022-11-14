@@ -1,0 +1,92 @@
+version: "3.3"
+
+services:
+  caffshop-traefik:
+    image: traefik:v2.5
+    restart: always
+    container_name: caffshop-traefik
+    ports:
+      - "80:80"
+      - "8085:8080"
+    command:
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --api.debug=true
+      - --log.level=DEBUG
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=caffshop-web
+      - --entrypoints.web.address=:80
+      - --accessLog.filePath=/traefik/access.log
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/traefik
+    networks:
+      - caffshop-web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.service=api@internal"
+    
+  caffshop-static:
+    image: httpd:2.4
+    restart: always
+    container_name: caffshop-static
+    volumes:
+      - ./frontend/dist/frontend:/usr/local/apache2/htdocs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.root.entrypoints=web"
+      - "traefik.http.routers.root.rule=Path(`/`)"
+      - "traefik.http.routers.static.entrypoints=web"
+      - "traefik.http.routers.static.rule=Path(`/{[\\.a-zA-Z0-9]+\\.{1}(js|css|ico|html){1}}`)"
+      - "traefik.http.routers.assets.entrypoints=web"
+      - "traefik.http.routers.assets.rule=PathPrefix(`/assets`)"
+    networks:
+      - caffshop-web
+      
+  caffshop-db:
+    image: mysql:8.0
+    restart: always
+    container_name: caffshop-db
+    environment:
+      MYSQL_DATABASE: 'caffshop'
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - caffshop-internal
+
+  caffshop:
+    image: openjdk:17-slim
+    restart: always
+    container_name: caffshop
+    depends_on:
+      - caffshop-db
+    command: "java -jar /usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
+    volumes:
+      - "./backend/target/caffshop.backend-0.0.1-SNAPSHOT.jar:/usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.auth.loadbalancer.server.port=8080"
+      - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/api`)"
+      - "traefik.docker.network=caffshop-web"
+    networks:
+      - caffshop-web
+      - caffshop-internal
+
+networks:
+  caffshop-web:
+    external: false
+    name: caffshop-web
+  caffshop-internal:
+    external: false
+    name: caffshop-internal
+    
+volumes:
+  caffshop-static:
+    driver: local
+  caffshop:
+    driver: local
+  caffshop-db:
+    driver: local
