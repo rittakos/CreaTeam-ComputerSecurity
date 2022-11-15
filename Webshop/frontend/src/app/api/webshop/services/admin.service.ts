@@ -26,7 +26,7 @@ export class AdminService extends BaseService {
   /**
    * Path part for operation putAdminModifyUser
    */
-  static readonly PutAdminModifyUserPath = '/admin/modifyUser';
+  static readonly PutAdminModifyUserPath = '/admin/modifyUser/{id}';
 
   /**
    * modify details of a user
@@ -36,7 +36,8 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  putAdminModifyUser$Response(params?: {
+  putAdminModifyUser$Response(params: {
+    id: number;
     context?: HttpContext
     body?: ModifyUserRequest
   }
@@ -44,6 +45,7 @@ export class AdminService extends BaseService {
 
     const rb = new RequestBuilder(this.rootUrl, AdminService.PutAdminModifyUserPath, 'put');
     if (params) {
+      rb.path('id', params.id, {});
       rb.body(params.body, 'application/json');
     }
 
@@ -67,7 +69,8 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  putAdminModifyUser(params?: {
+  putAdminModifyUser(params: {
+    id: number;
     context?: HttpContext
     body?: ModifyUserRequest
   }
@@ -75,6 +78,62 @@ export class AdminService extends BaseService {
 
     return this.putAdminModifyUser$Response(params).pipe(
       map((r: StrictHttpResponse<UserDetailsResponse>) => r.body as UserDetailsResponse)
+    );
+  }
+
+  /**
+   * Path part for operation getAdminUsers
+   */
+  static readonly GetAdminUsersPath = '/admin/users';
+
+  /**
+   * Your GET endpoint.
+   *
+   * list all users for the admin
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getAdminUsers()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAdminUsers$Response(params?: {
+    context?: HttpContext
+  }
+): Observable<StrictHttpResponse<Array<UserDetailsResponse>>> {
+
+    const rb = new RequestBuilder(this.rootUrl, AdminService.GetAdminUsersPath, 'get');
+    if (params) {
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'json',
+      accept: 'application/json',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return r as StrictHttpResponse<Array<UserDetailsResponse>>;
+      })
+    );
+  }
+
+  /**
+   * Your GET endpoint.
+   *
+   * list all users for the admin
+   *
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `getAdminUsers$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getAdminUsers(params?: {
+    context?: HttpContext
+  }
+): Observable<Array<UserDetailsResponse>> {
+
+    return this.getAdminUsers$Response(params).pipe(
+      map((r: StrictHttpResponse<Array<UserDetailsResponse>>) => r.body as Array<UserDetailsResponse>)
     );
   }
 
