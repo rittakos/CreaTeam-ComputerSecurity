@@ -3,11 +3,14 @@ package hu.bme.hit.vihima06.caffshop.backend.controller;
 import hu.bme.hit.vihima06.caffshop.backend.api.FilesApi;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundException;
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
+import hu.bme.hit.vihima06.caffshop.backend.service.CaffFileDataService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,14 +22,24 @@ import java.util.List;
 
 @RestController
 public class FilesController implements FilesApi {
+
+    @Autowired
+    private CaffFileDataService fileService;
+
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteFilesDelete(Integer id) {
-        return null;
+        fileService.deleteById(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<CaffDetailsResponse> getFileDetails(Integer id) {
-        return null;
+        CaffDetailsResponse fileDetails = fileService.getFileDetailsById(id);
+
+        return new ResponseEntity<>(fileDetails, HttpStatus.OK);
     }
 
     @Override
@@ -68,8 +81,11 @@ public class FilesController implements FilesApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<CaffResponse>> getFilesSearch(String query) {
-        return null;
+        List<CaffResponse> files = fileService.searchCaffFiles(query);
+
+        return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
     @Override
@@ -78,8 +94,11 @@ public class FilesController implements FilesApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<CaffDetailsResponse> postFilesModifyId(Integer id, ModifyCaffRequest body) {
-        return null;
+        CaffDetailsResponse file = fileService.modifyFile(id, body);
+
+        return new ResponseEntity<>(file, HttpStatus.ACCEPTED);
     }
 
     @Override
