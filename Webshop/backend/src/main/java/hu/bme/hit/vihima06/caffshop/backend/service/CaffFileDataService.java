@@ -3,12 +3,13 @@ package hu.bme.hit.vihima06.caffshop.backend.service;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.ForbiddenException;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundException;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CaffFileDataMapper;
+import hu.bme.hit.vihima06.caffshop.backend.mapper.CommentMapper;
 import hu.bme.hit.vihima06.caffshop.backend.model.CaffFileData;
+import hu.bme.hit.vihima06.caffshop.backend.model.Comment;
 import hu.bme.hit.vihima06.caffshop.backend.model.User;
-import hu.bme.hit.vihima06.caffshop.backend.models.CaffDetailsResponse;
-import hu.bme.hit.vihima06.caffshop.backend.models.CaffResponse;
-import hu.bme.hit.vihima06.caffshop.backend.models.ModifyCaffRequest;
+import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CaffFileDataRepository;
+import hu.bme.hit.vihima06.caffshop.backend.repository.CommentRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class CaffFileDataService {
 
     @Autowired
     private CaffFileDataRepository caffFileDataRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private LoggedInUserService loggedInUserService;
@@ -69,5 +73,17 @@ public class CaffFileDataService {
         caffFileDataRepository.save(caffFileData);
 
         return CaffFileDataMapper.INSTANCE.fileToCaffDetailsResponse(caffFileData);
+    }
+
+    public CommentResponse comment(Integer fileId, CommentRequest commentRequest) {
+        User loggedInUser = loggedInUserService.getLoggedInUser();
+
+        CaffFileData file = caffFileDataRepository.findById(fileId).orElseThrow(() -> new NotFoundException("File not found"));
+
+        Comment comment = new Comment(commentRequest.getComment(), loggedInUser, file);
+
+        commentRepository.save(comment);
+
+        return CommentMapper.INSTANCE.commentToCommentResponse(comment);
     }
 }

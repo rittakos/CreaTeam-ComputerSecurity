@@ -47,6 +47,10 @@ public class CaffFileData {
     @Column(name = "price", nullable = false)
     private Double price;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "caff_file_data_id")
+    private List<Comment> comments = new ArrayList();
+
     public CaffFileData() {
     }
 
@@ -139,5 +143,13 @@ public class CaffFileData {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

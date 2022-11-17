@@ -89,13 +89,16 @@ public class FilesController implements FilesApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<CommentResponse> postFilesCommentFileId(Integer fileId, CommentRequest body) {
-        return null;
+        CommentResponse comment = fileService.comment(fileId, body);
+
+        return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
     @Override
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<CaffDetailsResponse> postFilesModifyId(Integer id, ModifyCaffRequest body) {
+    public ResponseEntity<CaffDetailsResponse> putFilesModifyId(Integer id, ModifyCaffRequest body) {
         CaffDetailsResponse file = fileService.modifyFile(id, body);
 
         return new ResponseEntity<>(file, HttpStatus.ACCEPTED);

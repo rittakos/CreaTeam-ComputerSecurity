@@ -180,7 +180,7 @@ paths:
         required: true
     put:
       summary: ''
-      operationId: post-files-modify-id
+      operationId: put-files-modify-id
       responses:
         '200':
           description: OK

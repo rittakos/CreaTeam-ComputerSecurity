@@ -3,7 +3,7 @@ package hu.bme.hit.vihima06.caffshop.backend.model;
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity
+@Entity(name = "RefreshToken")
 @Table(name = "refresh_token")
 public class RefreshToken {
     @Id
