@@ -35,12 +35,12 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-devtools</artifactId>-->
+<!--			<scope>runtime</scope>-->
+<!--			<optional>true</optional>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
@@ -136,11 +136,13 @@
 						<configuration>
 							<inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
 							<language>spring</language>
-							<output>${project.build.directory}/generated-sources/</output>
 							<generateSupportingFiles>false</generateSupportingFiles>
-							<apiPackage>hu.bme.hit.vihima06.caffshop.backend.api</apiPackage>
-							<modelPackage>hu.bme.hit.vihima06.caffshop.backend.models</modelPackage>
 							<configOptions>
+								<basePackage>hu.bme.hit.vihima06.caffshop.backend</basePackage>
+								<apiPackage>hu.bme.hit.vihima06.caffshop.backend.api</apiPackage>
+								<modelPackage>hu.bme.hit.vihima06.caffshop.backend.models</modelPackage>
+								<sourceFolder>src/main/java</sourceFolder>
+								<hideGenerationTimestamp>true</hideGenerationTimestamp>
 								<interfaceOnly>true</interfaceOnly>
 								<dateLibrary>legacy</dateLibrary>
 							</configOptions>

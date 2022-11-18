@@ -20,16 +20,16 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${auth.app.jwtSecret}")
+    @Value("${caffshop.auth.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${auth.app.jwtRefreshSecret}")
+    @Value("${caffshop.auth.jwtRefreshSecret}")
     private String jwtRefreshSecret;
 
-    @Value("${auth.app.jwtExpirationMs}")
+    @Value("${caffshop.auth.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    @Value("${auth.app.jwtRefreshExpirationMs}")
+    @Value("${caffshop.auth.jwtRefreshExpirationMs}")
     private int jwtRefreshExpirationMs;
 
     private static String NAME = "name";

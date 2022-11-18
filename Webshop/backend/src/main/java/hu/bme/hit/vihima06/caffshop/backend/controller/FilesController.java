@@ -5,23 +5,28 @@ import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundExcept
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.service.CaffFileDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 public class FilesController implements FilesApi {
+
+    private static String CAFF_FOLDER = "caffs";
+    private static String PREVIEW_FOLDER = "previews";
+
+    @Value("${caffshop.upload-folder}")
+    private String uploadFolder;
 
     @Autowired
     private CaffFileDataService fileService;
@@ -44,11 +49,9 @@ public class FilesController implements FilesApi {
 
     @Override
     public ResponseEntity<Resource> getFilesDownload(Integer id) {
-        File file;
+        File file = new File(uploadFolder + "/" + CAFF_FOLDER + "/" + "test.caff");
 
-        try {
-            file = ResourceUtils.getFile("classpath:test.caff");
-        } catch (FileNotFoundException e) {
+        if (!file.exists()) {
             throw new NotFoundException("File not found");
         }
 
@@ -63,11 +66,9 @@ public class FilesController implements FilesApi {
 
     @Override
     public ResponseEntity<Resource> getFilesPreview(Integer id) {
-        File file;
+        File file = new File(uploadFolder + "/" + PREVIEW_FOLDER + "/" + "bmp_24.bmp");
 
-        try {
-            file = ResourceUtils.getFile("classpath:bmp_24.bmp");
-        } catch (FileNotFoundException e) {
+        if (!file.exists()) {
             throw new NotFoundException("File not found");
         }
 
@@ -107,11 +108,7 @@ public class FilesController implements FilesApi {
     @Override
     public ResponseEntity<FileUploadResponse> postFilesUpload(String name, Double price, MultipartFile file) {
         try {
-            File uploadfile = new File(
-                    ResourceUtils.getFile("classpath:").getCanonicalPath()
-                            + "/"
-                            + file.getOriginalFilename()
-            );
+            File uploadfile = new File(uploadFolder + "/" + CAFF_FOLDER + "/" + file.getOriginalFilename());
             file.transferTo(uploadfile);
         } catch (IOException e) {
             throw new RuntimeException(e);
