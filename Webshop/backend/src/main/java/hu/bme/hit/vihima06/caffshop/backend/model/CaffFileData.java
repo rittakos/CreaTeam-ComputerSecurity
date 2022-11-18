@@ -19,8 +19,8 @@ public class CaffFileData {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "caff_file_name", nullable = false)
-    private String caffFileName;
+    @Column(name = "stored_file_name", nullable = false, unique = true)
+    private String storedFileName;
 
     @Column(name = "upload_date", nullable = false, updatable = false)
     private Date uploadDate = new Date();
@@ -54,9 +54,9 @@ public class CaffFileData {
     public CaffFileData() {
     }
 
-    public CaffFileData(String name, String caffFileName, User creator, List<String> tags, String description, Integer width, Integer height, Double price) {
+    public CaffFileData(String name, String storedFileName, User creator, List<String> tags, String description, Integer width, Integer height, Double price) {
         this.name = name;
-        this.caffFileName = caffFileName;
+        this.storedFileName = storedFileName;
         this.creator = creator;
         this.tags = tags;
         this.description = description;
@@ -81,12 +81,12 @@ public class CaffFileData {
         this.name = name;
     }
 
-    public String getCaffFileName() {
-        return caffFileName;
+    public String getStoredFileName() {
+        return storedFileName;
     }
 
-    public void setCaffFileName(String caffFileName) {
-        this.caffFileName = caffFileName;
+    public void setStoredFileName(String caffFileName) {
+        this.storedFileName = caffFileName;
     }
 
     public Date getUploadDate() {

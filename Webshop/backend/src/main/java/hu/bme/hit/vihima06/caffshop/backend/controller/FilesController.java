@@ -1,12 +1,11 @@
 package hu.bme.hit.vihima06.caffshop.backend.controller;
 
 import hu.bme.hit.vihima06.caffshop.backend.api.FilesApi;
-import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundException;
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
-import hu.bme.hit.vihima06.caffshop.backend.service.CaffFileDataService;
+import hu.bme.hit.vihima06.caffshop.backend.config.Constants;
+import hu.bme.hit.vihima06.caffshop.backend.service.FileService;
+import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,20 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 public class FilesController implements FilesApi {
 
-    private static String CAFF_FOLDER = "caffs";
-    private static String PREVIEW_FOLDER = "previews";
-
-    @Value("${caffshop.upload-folder}")
-    private String uploadFolder;
-
     @Autowired
-    private CaffFileDataService fileService;
+    private FileService fileService;
 
     @Override
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -48,37 +40,33 @@ public class FilesController implements FilesApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Resource> getFilesDownload(Integer id) {
-        File file = new File(uploadFolder + "/" + CAFF_FOLDER + "/" + "test.caff");
-
-        if (!file.exists()) {
-            throw new NotFoundException("File not found");
-        }
+        FileDataDTO fileDataDTO = fileService.getCaffFileForDownloadById(id);
 
         HttpHeaders respHeaders = new HttpHeaders();
-        respHeaders.setContentLength(file.length());
-        respHeaders.setContentDispositionFormData("attachment", "test.caff");
-
-        return new ResponseEntity<>(
-                new FileSystemResource(file), respHeaders, HttpStatus.OK
+        respHeaders.setContentLength(fileDataDTO.getLength());
+        respHeaders.setContentDispositionFormData(
+                "attachment",
+                fileDataDTO.getFileName() + Constants.CAFF_EXTENSION
         );
+
+        return new ResponseEntity<>(fileDataDTO.getFileResource(), respHeaders, HttpStatus.OK);
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Resource> getFilesPreview(Integer id) {
-        File file = new File(uploadFolder + "/" + PREVIEW_FOLDER + "/" + "bmp_24.bmp");
-
-        if (!file.exists()) {
-            throw new NotFoundException("File not found");
-        }
+        FileDataDTO fileDataDTO = fileService.getPreviewFileDataById(id);
 
         HttpHeaders respHeaders = new HttpHeaders();
-        respHeaders.setContentLength(file.length());
-        respHeaders.setContentDispositionFormData("attachment", "preview.bmp");
-
-        return new ResponseEntity<>(
-                new FileSystemResource(file), respHeaders, HttpStatus.OK
+        respHeaders.setContentLength(fileDataDTO.getLength());
+        respHeaders.setContentDispositionFormData(
+                "attachment",
+                fileDataDTO.getFileName() + Constants.BMP_EXTENSION
         );
+
+        return new ResponseEntity<>(fileDataDTO.getFileResource(), respHeaders, HttpStatus.OK);
     }
 
     @Override
@@ -106,15 +94,11 @@ public class FilesController implements FilesApi {
     }
 
     @Override
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<FileUploadResponse> postFilesUpload(String name, Double price, MultipartFile file) {
-        try {
-            File uploadfile = new File(uploadFolder + "/" + CAFF_FOLDER + "/" + file.getOriginalFilename());
-            file.transferTo(uploadfile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FileUploadResponse fileUploadResponse = fileService.uploadFile(name, price, file);
 
-        return new ResponseEntity<>(new FileUploadResponse().id(42), HttpStatus.CREATED);
+        return new ResponseEntity<>(fileUploadResponse, HttpStatus.CREATED);
     }
 
 }
