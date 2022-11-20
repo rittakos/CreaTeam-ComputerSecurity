@@ -4,6 +4,7 @@ import hu.bme.hit.vihima06.caffshop.backend.config.Constants;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.BadRequestException;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.ForbiddenException;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundException;
+import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.UnauthorizedException;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CaffFileDataMapper;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CommentMapper;
 import hu.bme.hit.vihima06.caffshop.backend.model.CaffFileData;
@@ -12,6 +13,7 @@ import hu.bme.hit.vihima06.caffshop.backend.model.User;
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CaffFileDataRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CommentRepository;
+import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,13 +58,15 @@ public class FileService {
     }
 
     public CaffDetailsResponse getFileDetailsById(Integer id) {
-        Optional<CaffFileData> caffFileData = caffFileDataRepository.findById(id);
+        User loggedInUser = loggedInUserService.getLoggedInUser();
 
-        if (caffFileData.isEmpty()) {
-            throw new NotFoundException("File not found");
-        }
+        CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
-        return CaffFileDataMapper.INSTANCE.fileToCaffDetailsResponse(caffFileData.get());
+        CaffDetailsResponse caffDetailsResponse = CaffFileDataMapper.INSTANCE.fileToCaffDetailsResponse(caffFileData);
+
+        caffDetailsResponse.setPurchased(caffFileData.getUsersPurchased().stream().anyMatch(u -> u.getId().equals(loggedInUser.getId())));
+
+        return caffDetailsResponse;
     }
 
     public List<CaffResponse> searchCaffFiles(String query) {
@@ -153,7 +157,8 @@ public class FileService {
                 "description",
                 1,
                 1,
-                price
+                price,
+                1.0
         );
 
         caffFileDataRepository.save(caffFileData);
@@ -178,4 +183,13 @@ public class FileService {
         return new FileDataDTO(caffFileData.getName(), new FileSystemResource(file), file.length());
     }
 
+    public void buyFileById(Integer id) {
+        User loggedInUser = loggedInUserService.getLoggedInUser();
+
+        CaffFileData file = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
+
+        file.getUsersPurchased().add(loggedInUser);
+
+        caffFileDataRepository.save(file);
+    }
 }

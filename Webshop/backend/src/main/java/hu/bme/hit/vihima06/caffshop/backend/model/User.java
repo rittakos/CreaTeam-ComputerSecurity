@@ -36,6 +36,12 @@ public class User {
     @JoinColumn(name = "creator_id")
     private List<CaffFileData> caffFiles = new ArrayList();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_bought_caffs",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "caff_id"))
+    private List<CaffFileData> purchasedCaffFiles = new ArrayList();
+
     public User() {
     }
 
@@ -101,5 +107,13 @@ public class User {
 
     public void setCaffFiles(List<CaffFileData> caffFiles) {
         this.caffFiles = caffFiles;
+    }
+
+    public List<CaffFileData> getPurchasedCaffFiles() {
+        return purchasedCaffFiles;
+    }
+
+    public void setPurchasedCaffFiles(List<CaffFileData> purchasedCaffFiles) {
+        this.purchasedCaffFiles = purchasedCaffFiles;
     }
 }

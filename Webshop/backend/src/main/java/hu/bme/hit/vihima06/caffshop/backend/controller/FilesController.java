@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 
 @RestController
@@ -75,6 +74,13 @@ public class FilesController implements FilesApi {
         List<CaffResponse> files = fileService.searchCaffFiles(query);
 
         return new ResponseEntity<>(files, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> postFilesBuyId(Integer id) {
+        fileService.buyFileById(id);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Override

@@ -5,10 +5,11 @@ import { PublicUserDetailsResponse } from './public-user-details-response';
 export interface CaffDetailsResponse {
   comments: Array<CommentResponse>;
   creator: PublicUserDetailsResponse;
-  description: string;
+  duration: number;
   id: number;
   name: string;
   price: number;
+  purchased: boolean;
   size: {
 'width': number;
 'height': number;

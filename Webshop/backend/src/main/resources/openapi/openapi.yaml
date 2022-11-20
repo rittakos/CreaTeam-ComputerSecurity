@@ -286,6 +286,22 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FileUploadRequest'
+  '/files/buy/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-files-buy-id
+      responses:
+        '201':
+          description: Created
+      description: Buy a caff file
+      tags:
+        - files
 components:
   schemas:
     RegistrationRequest:
@@ -385,8 +401,6 @@ components:
           type: array
           items:
             type: string
-        description:
-          type: string
         size:
           type: object
           required:
@@ -406,16 +420,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CommentResponse'
+        duration:
+          type: number
+        purchased:
+          type: boolean
       required:
         - id
         - name
         - uploadDate
         - tags
-        - description
         - size
         - price
         - creator
         - comments
+        - duration
+        - purchased
     PublicUserDetailsResponse:
       title: PublicUserDetailsResponse
       type: object

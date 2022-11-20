@@ -47,14 +47,23 @@ public class CaffFileData {
     @Column(name = "price", nullable = false)
     private Double price;
 
+    @Column(name = "duration", nullable = false)
+    private Double duration;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "caff_file_data_id")
     private List<Comment> comments = new ArrayList();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_bought_caffs",
+            joinColumns = @JoinColumn(name = "caff_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> usersPurchased = new ArrayList();
+
     public CaffFileData() {
     }
 
-    public CaffFileData(String name, String storedFileName, User creator, List<String> tags, String description, Integer width, Integer height, Double price) {
+    public CaffFileData(String name, String storedFileName, User creator, List<String> tags, String description, Integer width, Integer height, Double price, Double duration) {
         this.name = name;
         this.storedFileName = storedFileName;
         this.creator = creator;
@@ -63,6 +72,7 @@ public class CaffFileData {
         this.width = width;
         this.height = height;
         this.price = price;
+        this.duration = duration;
     }
 
     public Integer getId() {
@@ -145,11 +155,27 @@ public class CaffFileData {
         this.price = price;
     }
 
+    public Double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Double duration) {
+        this.duration = duration;
+    }
+
     public List<Comment> getComments() {
         return comments;
     }
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public List<User> getUsersPurchased() {
+        return usersPurchased;
+    }
+
+    public void setUsersPurchased(List<User> usersPurchased) {
+        this.usersPurchased = usersPurchased;
     }
 }
