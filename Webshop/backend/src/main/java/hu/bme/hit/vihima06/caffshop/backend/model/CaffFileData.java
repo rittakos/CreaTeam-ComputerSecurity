@@ -35,9 +35,6 @@ public class CaffFileData {
     @Column(name = "tags")
     private List<String> tags = new ArrayList();
 
-    @Column(name = "description", nullable = false)
-    private String description;
-
     @Column(name = "width", nullable = false)
     private Integer width;
 
@@ -63,12 +60,11 @@ public class CaffFileData {
     public CaffFileData() {
     }
 
-    public CaffFileData(String name, String storedFileName, User creator, List<String> tags, String description, Integer width, Integer height, Double price, Double duration) {
+    public CaffFileData(String name, String storedFileName, User creator, List<String> tags, Integer width, Integer height, Double price, Double duration) {
         this.name = name;
         this.storedFileName = storedFileName;
         this.creator = creator;
         this.tags = tags;
-        this.description = description;
         this.width = width;
         this.height = height;
         this.price = price;
@@ -121,14 +117,6 @@ public class CaffFileData {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Integer getWidth() {

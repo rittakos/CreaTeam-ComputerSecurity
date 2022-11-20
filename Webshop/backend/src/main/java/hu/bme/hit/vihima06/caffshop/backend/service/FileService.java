@@ -154,7 +154,6 @@ public class FileService {
                 fileName,
                 loggedInUser,
                 List.of("tags"),
-                "description",
                 1,
                 1,
                 price,
