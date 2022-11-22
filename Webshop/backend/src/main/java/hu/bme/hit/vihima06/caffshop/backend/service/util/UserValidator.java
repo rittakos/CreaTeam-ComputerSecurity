@@ -9,7 +9,7 @@ public class UserValidator {
         return name.trim().length() > 3;
     }
 
-    public static boolean validateUsrname(String username) {
+    public static boolean validateUsername(String username) {
         Pattern usernamePattern = Pattern.compile("^(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$");
         Matcher usernameMatcher = usernamePattern.matcher(username);
 

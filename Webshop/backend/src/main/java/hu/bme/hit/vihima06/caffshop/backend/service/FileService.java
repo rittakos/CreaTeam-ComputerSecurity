@@ -70,7 +70,7 @@ public class FileService {
     }
 
     public List<CaffResponse> searchCaffFiles(String query) {
-        List<CaffFileData> results = caffFileDataRepository.findAllByNameOrCreatorOrTags(query, query, query);
+        List<CaffFileData> results = caffFileDataRepository.findAllByNameContains(query);
 
         return results.stream().map(r -> CaffFileDataMapper.INSTANCE.fileToCaffResponse(r)).toList();
     }
