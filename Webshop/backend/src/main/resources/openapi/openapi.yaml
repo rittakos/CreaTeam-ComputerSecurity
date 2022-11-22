@@ -180,7 +180,7 @@ paths:
         required: true
     put:
       summary: ''
-      operationId: post-files-modify-id
+      operationId: put-files-modify-id
       responses:
         '200':
           description: OK
@@ -308,6 +308,22 @@ paths:
                   $ref: '#/components/schemas/UserDetailsResponse'
       operationId: get-admin-users
       description: list all users for the admin
+  '/files/buy/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-files-buy-id
+      responses:
+        '201':
+          description: Created
+      description: Buy a caff file
+      tags:
+        - files
 components:
   schemas:
     RegistrationRequest:
@@ -407,8 +423,6 @@ components:
           type: array
           items:
             type: string
-        description:
-          type: string
         size:
           type: object
           required:
@@ -428,6 +442,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CommentResponse'
+        duration:
+          type: number
+        purchased:
+          type: boolean
       required:
         - id
         - name
@@ -438,6 +456,8 @@ components:
         - price
         - creator
         - comments
+        - duration
+        - purchased
     PublicUserDetailsResponse:
       title: PublicUserDetailsResponse
       type: object

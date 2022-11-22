@@ -63,6 +63,9 @@ services:
     depends_on:
       - caffshop-db
     command: "mvn clean spring-boot:run -DskipTests"
+    environment:
+      UPLOAD_FOLDER: '/usr/local/app'
+      DATABASE_URL: 'caffshop-db'
     volumes:
       - "./backend/src:/src"
       - "./backend/pom.xml:/pom.xml"

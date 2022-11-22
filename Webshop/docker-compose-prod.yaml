@@ -63,6 +63,9 @@ services:
     depends_on:
       - caffshop-db
     command: "java -jar /usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
+    environment:
+      UPLOAD_FOLDER: '/usr/local/app'
+      DATABASE_URL: 'caffshop-db'
     volumes:
       - "./backend/target/caffshop.backend-0.0.1-SNAPSHOT.jar:/usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
     labels:

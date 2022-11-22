@@ -260,26 +260,26 @@ export class FilesService extends BaseService {
   }
 
   /**
-   * Path part for operation postFilesModifyId
+   * Path part for operation putFilesModifyId
    */
-  static readonly PostFilesModifyIdPath = '/files/modify/{id}';
+  static readonly PutFilesModifyIdPath = '/files/modify/{id}';
 
   /**
    * modify the details of a caff file
    *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `postFilesModifyId()` instead.
+   * To access only the response body, use `putFilesModifyId()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  postFilesModifyId$Response(params: {
+  putFilesModifyId$Response(params: {
     id: number;
     context?: HttpContext
     body?: ModifyCaffRequest
   }
 ): Observable<StrictHttpResponse<CaffDetailsResponse>> {
 
-    const rb = new RequestBuilder(this.rootUrl, FilesService.PostFilesModifyIdPath, 'put');
+    const rb = new RequestBuilder(this.rootUrl, FilesService.PutFilesModifyIdPath, 'put');
     if (params) {
       rb.path('id', params.id, {});
       rb.body(params.body, 'application/json');
@@ -301,18 +301,18 @@ export class FilesService extends BaseService {
    * modify the details of a caff file
    *
    * This method provides access to only to the response body.
-   * To access the full response (for headers, for example), `postFilesModifyId$Response()` instead.
+   * To access the full response (for headers, for example), `putFilesModifyId$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  postFilesModifyId(params: {
+  putFilesModifyId(params: {
     id: number;
     context?: HttpContext
     body?: ModifyCaffRequest
   }
 ): Observable<CaffDetailsResponse> {
 
-    return this.postFilesModifyId$Response(params).pipe(
+    return this.putFilesModifyId$Response(params).pipe(
       map((r: StrictHttpResponse<CaffDetailsResponse>) => r.body as CaffDetailsResponse)
     );
   }
@@ -487,6 +487,61 @@ export class FilesService extends BaseService {
 
     return this.postFilesUpload$Response(params).pipe(
       map((r: StrictHttpResponse<FileUploadResponse>) => r.body as FileUploadResponse)
+    );
+  }
+
+  /**
+   * Path part for operation postFilesBuyId
+   */
+  static readonly PostFilesBuyIdPath = '/files/buy/{id}';
+
+  /**
+   * Buy a caff file
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `postFilesBuyId()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  postFilesBuyId$Response(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<StrictHttpResponse<void>> {
+
+    const rb = new RequestBuilder(this.rootUrl, FilesService.PostFilesBuyIdPath, 'post');
+    if (params) {
+      rb.path('id', params.id, {});
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'text',
+      accept: '*/*',
+      context: params?.context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      })
+    );
+  }
+
+  /**
+   * Buy a caff file
+   *
+   * This method provides access to only to the response body.
+   * To access the full response (for headers, for example), `postFilesBuyId$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  postFilesBuyId(params: {
+    id: number;
+    context?: HttpContext
+  }
+): Observable<void> {
+
+    return this.postFilesBuyId$Response(params).pipe(
+      map((r: StrictHttpResponse<void>) => r.body as void)
     );
   }
 
