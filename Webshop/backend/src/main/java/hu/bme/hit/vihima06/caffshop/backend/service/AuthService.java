@@ -19,6 +19,7 @@ import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.jwt.JwtUtils;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.UserDetailsImpl;
 import hu.bme.hit.vihima06.caffshop.backend.service.util.EmailValidator;
+import hu.bme.hit.vihima06.caffshop.backend.service.util.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -125,19 +126,19 @@ public class AuthService {
     public void register(RegistrationRequest registrationRequest) {
         String email = registrationRequest.getEmail().toLowerCase();
 
-        if (registrationRequest.getName().trim().length() < 3) {
-            throw new BadRequestException("Error: Name should be at least 3 characters long!");
+        if (!UserValidator.validateName(registrationRequest.getName())) {
+            throw new BadRequestException("Error: Name should be at least 4 characters long!");
         }
 
-        if (registrationRequest.getUsername().trim().length() < 3) {
-            throw new BadRequestException("Error: Name should be at least 3 characters long!");
+        if (UserValidator.validateUsrname(registrationRequest.getUsername())) {
+            throw new BadRequestException("Error: Name should be at least 4 characters long!");
         }
 
         if (!EmailValidator.validateEmail(email)) {
             throw new BadRequestException("Error: Email is invalid!");
         }
 
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new BadRequestException("Error: Email is already in use!");
         }
 

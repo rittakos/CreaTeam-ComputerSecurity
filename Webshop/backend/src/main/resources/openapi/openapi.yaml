@@ -198,27 +198,6 @@ paths:
               $ref: '#/components/schemas/ModifyCaffRequest'
       tags:
         - files
-  /admin/modifyUser:
-    put:
-      summary: ''
-      operationId: put-admin-modifyUser
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDetailsResponse'
-        '400':
-          description: Bad Request
-      description: modify details of a user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModifyUserRequest'
-      tags:
-        - admin
   '/files/preview/{id}':
     get:
       summary: Your GET endpoint
@@ -286,6 +265,49 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FileUploadRequest'
+  '/admin/modifyUser/{id}':
+    put:
+      summary: ''
+      operationId: put-admin-modifyUser
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          description: Bad Request
+      description: modify details of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyUserRequest'
+      tags:
+        - admin
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  /admin/users:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDetailsResponse'
+      operationId: get-admin-users
+      description: list all users for the admin
 components:
   schemas:
     RegistrationRequest:
