@@ -22,11 +22,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -148,6 +151,27 @@ public class FileService {
         }
 
         // TODO parse
+        Runtime rt = Runtime.getRuntime();
+        String[] commands = { "/bin/bash", "-c", "cd /usr/local/app/parser/ && ./parser /usr/local/app/uploads/caffs/" + fileName + ".caff preview /usr/local/app/uploads/previews/" + fileName +".bmp" };
+        Process proc = null;
+        try {
+            proc = rt.exec(commands);
+
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+            System.out.println("Here is the standard output of the command:");
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+            }
+            System.out.println("Here is the standard error of the command (if any):");
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         CaffFileData caffFileData = new CaffFileData(
                 name,

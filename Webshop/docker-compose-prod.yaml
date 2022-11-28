@@ -26,11 +26,23 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.service=api@internal"
-    
+
+  frontend-build:
+    image: node:16-slim
+    container_name: frontend-build
+    working_dir: /usr/app
+    volumes:
+      - ./frontend/:/usr/app
+    entrypoint: ["/bin/bash", "-c"]
+    command: 
+      - npm install && npm run build
+
   caffshop-static:
     image: httpd:2.4
     restart: always
     container_name: caffshop-static
+    depends_on:
+      - "frontend-build"
     volumes:
       - ./frontend/dist/frontend:/usr/local/apache2/htdocs
     labels:
@@ -43,14 +55,24 @@ services:
       - "traefik.http.routers.assets.rule=PathPrefix(`/assets`)"
     networks:
       - caffshop-web
-      
+
+  parser-build:
+    image: openjdk:17-slim
+    container_name: parser-build
+    working_dir: /build
+    volumes:
+      - ../Parser:/build
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - apt-get update && apt install gcc -y && apt install g++ -y && apt install make -y && apt install cmake -y && cd build && cmake .. && cmake --build .
+
   caffshop-db:
     image: mysql:8.0
     restart: always
     container_name: caffshop-db
     environment:
-      MYSQL_DATABASE: 'caffshop'
-      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: "caffshop"
+      MYSQL_ROOT_PASSWORD: "root"
     volumes:
       - ./mysql:/var/lib/mysql
     networks:
@@ -64,10 +86,12 @@ services:
       - caffshop-db
     command: "java -jar /usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
     environment:
-      UPLOAD_FOLDER: '/usr/local/app'
-      DATABASE_URL: 'caffshop-db'
+      UPLOAD_FOLDER: "/usr/local/app/uploads"
+      DATABASE_URL: "caffshop-db"
+      PARSER_APTH: "/usr/local/app/parser"
     volumes:
       - "./backend/target/caffshop.backend-0.0.1-SNAPSHOT.jar:/usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
+      - "../Parser/build:/usr/local/app/parser"
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.auth.loadbalancer.server.port=8080"
@@ -85,7 +109,7 @@ networks:
   caffshop-internal:
     external: false
     name: caffshop-internal
-    
+
 volumes:
   caffshop-static:
     driver: local
