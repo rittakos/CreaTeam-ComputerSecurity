@@ -26,11 +26,23 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.service=api@internal"
+
+  frontend-build:
+    image: node:16-slim
+    container_name: frontend-build
+    working_dir: /usr/app
+    volumes:
+      - ./frontend/:/usr/app
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - npm install && npm run build
     
   caffshop-static:
     image: httpd:2.4
     restart: always
     container_name: caffshop-static
+    depends_on:
+      - "frontend-build"
     volumes:
       - ./frontend/dist/frontend:/usr/local/apache2/htdocs
     labels:
@@ -43,32 +55,44 @@ services:
       - "traefik.http.routers.assets.rule=PathPrefix(`/assets`)"
     networks:
       - caffshop-web
-      
+
+  parser-build:
+    image: maven:3.8-eclipse-temurin-17
+    container_name: parser-build
+    working_dir: /build
+    volumes:
+      - ../Parser:/build
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - apt-get update && apt install gcc -y && apt install g++ -y && apt install make -y && apt install cmake -y && cd build && cmake .. && cmake --build .
+
   caffshop-db:
     image: mysql:8.0
     restart: always
     container_name: caffshop-db
     environment:
-      MYSQL_DATABASE: 'caffshop'
-      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: "caffshop"
+      MYSQL_ROOT_PASSWORD: "root"
     volumes:
       - ./mysql:/var/lib/mysql
     networks:
       - caffshop-internal
 
   caffshop:
-    image: maven:3.8-eclipse-temurin-17-alpine
+    image: maven:3.8-eclipse-temurin-17
     restart: always
     container_name: caffshop
+    working_dir: /usr/local/app
     depends_on:
       - caffshop-db
     command: "mvn clean spring-boot:run -DskipTests"
     environment:
-      UPLOAD_FOLDER: '/usr/local/app'
-      DATABASE_URL: 'caffshop-db'
+      UPLOAD_FOLDER: "/usr/local/app/uploads"
+      DATABASE_URL: "caffshop-db"
     volumes:
-      - "./backend/src:/src"
-      - "./backend/pom.xml:/pom.xml"
+      - "./backend/src:/usr/local/app/src"
+      - "./backend/pom.xml:/usr/local/app/pom.xml"
+      - "../Parser/build:/usr/local/app/parser"
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.caffshop.loadbalancer.server.port=8080"
