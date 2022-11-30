@@ -3,41 +3,57 @@
 #include "bitmap.h"
 #include "error.h"
 #include "parser.hpp"
+#include "matadata.h"
 
 //#include <crtdbg.h>
 //
 //#define _CRTDBG_MAP_ALLOC
 
+std::ostream& os = std::cerr;
+
 enum Mode { Data, Preview, None };
 
-Error preview(const Caff& caff, const std::string& out)
+Error preview(const Caff& caff, std::optional<std::string> out)
 {
-	Error pathErr = checkExtension(out, "bmp");
+	if (!out.has_value())
+		return Error(InvalidPath, "No out file!!");
+
+	Error pathErr = checkExtension(out.value(), "bmp");
 	if (pathErr != OK)
 		return pathErr;
 
 	Bitmap bitmap;
 	if (caff.animations.size() > 0)
 	{
-		Error err = bitmap.save(caff.animations[0].ciff, out);
+		Error err = bitmap.save(caff.animations[0].ciff, out.value());
 		if (err == OK)
-			std::cout << "Bitmap generated succesfully!" << std::endl;
+			os << "Bitmap generated succesfully!" << std::endl;
 		else
-			err.writeErrorMessage(std::cout);
+			err.writeErrorMessage(os);
 	}
 	else
-		std::cout << "No ciff to generate preview!" << std::endl;
+		os << "No ciff to generate preview!" << std::endl;
 
 	return OK;
 }
 
-void data(const Caff& caff)
+void data(const Caff& caff, std::optional<std::string> jsonPath = {})
 {
-	std::string data = caff.dataToString();
-	std::cout << data;
+	MetaData metaData = caff.getMetaData();
+	if (!jsonPath.has_value())
+	{
+		metaData.write(std::cout);
+		//std::string data = caff.dataToString();
+		//std::cout << data;
+	}
+	else
+	{
+		metaData.createJSON().writeToFile(jsonPath.value());
+	}
+	
 }
 
-void processCaff(std::string filePath, Mode mode, std::string out = "")
+void processCaff(std::string filePath, Mode mode, std::optional<std::string> out = {})
 {
 	Caff caff;
 
@@ -45,30 +61,30 @@ void processCaff(std::string filePath, Mode mode, std::string out = "")
 
 	if (succes != ErrorType::OK)
 	{
-		succes.writeErrorMessage(std::cout);
+		succes.writeErrorMessage(os);
 		return;
 	}
 	else
-		std::cout << "CAFF File has been read succesfully!" << std::endl;
+		os << "CAFF File has been read succesfully!" << std::endl;
 
 	switch (mode)
 	{
 		case Data:
 		{
-			data(caff);
+			data(caff, out);
 			break;
 		}
 		case Preview:
 		{
 			Error err = preview(caff, out);
 			if (err != OK)
-				err.writeErrorMessage(std::cout);
+				err.writeErrorMessage(os);
 			break;
 		}
 		case None:
 		default:
 		{
-			std::cout << "Invalid Mode!" << std::endl;
+			os << "Invalid Mode!" << std::endl;
 		}
 	}
 }
@@ -89,7 +105,7 @@ int main(int argc, char* argv[])
 	else if (argc == 3)
 		processCaff(argv[1], mode);
 	else
-		std::cout << "Invalid Parameters!" << std::endl;
+		os << "Invalid Parameters!" << std::endl;
 
 	//_CrtDumpMemoryLeaks();
 

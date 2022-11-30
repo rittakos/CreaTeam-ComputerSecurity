@@ -152,7 +152,7 @@ std::optional<T> readBits(std::shared_ptr<std::ifstream> is, int size)
 	}
 	catch (...)
 	{
-		std::cout << "Problem while reading!" << std::endl;
+		std::cerr << "Problem while reading!" << std::endl;
 		return {};
 	}
 

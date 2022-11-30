@@ -5,6 +5,7 @@
 #include <fstream>
 #include "ciff.h"
 #include "error.h"
+#include "matadata.h"
 
 struct AnimationBlock
 {
@@ -24,7 +25,7 @@ struct Data
 	int width;
 	int height;
 
-	void write(std::ostream& os) const;
+	std::string toString() const;
 };
 
 
@@ -73,6 +74,7 @@ public:
 	
 	std::vector<AnimationBlock> animations;
 	
+	MetaData getMetaData() const;
 	
 	Error load(std::string path);
 	std::string dataToString() const;
