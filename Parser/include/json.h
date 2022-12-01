@@ -38,7 +38,7 @@ public:
 	std::vector<std::string> toString() const
 	{
 		std::vector<std::string> lines;
-		lines.push_back(name);
+		lines.push_back("\"" + name + "\":");
 		lines.push_back("[");
 		for(int idx = 0; idx < values.size() - 1; ++idx)
 			lines.push_back("\t\"" + values[idx] + "\",");
@@ -105,12 +105,17 @@ public:
 
 		std::ofstream os(path);
 
+		write(os);
+
+		if (os.is_open())
+			os.close();
+	}
+
+	void write(std::ostream& os) const
+	{
 		std::vector<std::string> lines = getLines();
 
 		for (std::string line : lines)
 			os << line << std::endl;
-
-		if (os.is_open())
-			os.close();
 	}
 };

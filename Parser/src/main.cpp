@@ -26,9 +26,11 @@ Error preview(const Caff& caff, std::optional<std::string> out)
 	if (caff.animations.size() > 0)
 	{
 		Error err = bitmap.save(caff.animations[0].ciff, out.value());
-		if (err == OK)
+		/*if (err == OK)
 			os << "Bitmap generated succesfully!" << std::endl;
-		else
+		else*/
+
+		if(err != OK)
 			err.writeErrorMessage(os);
 	}
 	else
@@ -42,7 +44,7 @@ void data(const Caff& caff, std::optional<std::string> jsonPath = {})
 	MetaData metaData = caff.getMetaData();
 	if (!jsonPath.has_value())
 	{
-		metaData.write(std::cout);
+		metaData.createJSON().write(std::cout);
 		//std::string data = caff.dataToString();
 		//std::cout << data;
 	}
@@ -64,8 +66,8 @@ void processCaff(std::string filePath, Mode mode, std::optional<std::string> out
 		succes.writeErrorMessage(os);
 		return;
 	}
-	else
-		os << "CAFF File has been read succesfully!" << std::endl;
+	//else
+		//os << "CAFF File has been read succesfully!" << std::endl;
 
 	switch (mode)
 	{
