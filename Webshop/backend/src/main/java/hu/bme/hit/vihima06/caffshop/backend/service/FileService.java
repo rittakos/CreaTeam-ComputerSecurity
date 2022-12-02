@@ -15,6 +15,8 @@ import hu.bme.hit.vihima06.caffshop.backend.repository.CommentRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ import static hu.bme.hit.vihima06.caffshop.backend.config.Constants.*;
 
 @Service
 public class FileService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
 
     private String uploadFolder;
 
@@ -57,7 +61,10 @@ public class FileService {
         File previewDirectory = new File(uploadFolder + File.separator + PREVIEW_FOLDER);
         if (!previewDirectory.exists()) {
             previewDirectory.mkdirs();
+            logger.info("Preview folder created");
         }
+
+        logger.info("Initialized");
     }
 
     public void deleteById(Integer id) {
@@ -66,6 +73,7 @@ public class FileService {
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
         if (!loggedInUser.getId().equals(caffFileData.getCreator().getId()) && !loggedInUserService.isAdmin()) {
+            logger.error("Access denied for deleting file by id {} by user {}", id, loggedInUser.getUsername());
             throw new ForbiddenException("File access denied");
         }
 
@@ -96,6 +104,8 @@ public class FileService {
         }
 
         caffFileDataRepository.delete(caffFileData);
+
+        logger.info("File {} deleted by user ", id, loggedInUser.getUsername());
     }
 
     public CaffDetailsResponse getFileDetailsById(Integer id) {
@@ -122,12 +132,15 @@ public class FileService {
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
         if (!loggedInUser.getId().equals(caffFileData.getCreator().getId()) && !loggedInUserService.isAdmin()) {
+            logger.error("Access denied for editing file by id {} by user {}", id, loggedInUser.getUsername());
             throw new ForbiddenException("File access denied");
         }
 
         caffFileData.setName(modifyCaffRequest.getName());
 
         caffFileDataRepository.save(caffFileData);
+
+        logger.info("File modified successfully by id {} by user {}", id, loggedInUser.getUsername());
 
         return CaffFileDataMapper.INSTANCE.fileToCaffDetailsResponse(caffFileData);
     }
@@ -150,10 +163,13 @@ public class FileService {
         User user = userRepository.findById(loggedInUser.getId()).orElseThrow(() -> new ForbiddenException("User not found"));
 
         if (!user.getPurchasedCaffFiles().stream().anyMatch(f -> f.getId().equals(id)) && !user.getCaffFiles().stream().anyMatch(f -> f.getId().equals(id)) && !loggedInUserService.isAdmin()) {
+            logger.error("File download forbidden for user {} by file id {}", loggedInUser.getUsername(), id);
             throw new ForbiddenException("File not purchased");
         }
 
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
+
+        logger.info("User {} downloaded file {}", loggedInUser.getUsername(), id);
 
         return getFileDataDTOByCaff(caffFileData, CAFF_FOLDER, CAFF_EXTENSION);
     }
@@ -177,6 +193,8 @@ public class FileService {
 
         String fileName = UUID.randomUUID().toString();
 
+        logger.info("File uploaded by user {} saving with UUID {}", loggedInUser.getUsername(), fileName);
+
         File uploadedfile;
         try {
             uploadedfile = new File(
@@ -189,6 +207,7 @@ public class FileService {
             );
             file.transferTo(uploadedfile);
         } catch (IOException e) {
+            logger.error("Error while saving uploaded file: {}", e.getMessage());
             throw new InternalServerErrorException(e.getMessage());
         }
 
@@ -207,6 +226,7 @@ public class FileService {
 
             if (!error.isEmpty()) {
                 uploadedfile.delete();
+                logger.error("Failed parsing file data {} uploaded by {}", fileName, loggedInUser.getUsername());
                 throw new BadRequestException("Invalid caff file");
             }
 
@@ -216,11 +236,13 @@ public class FileService {
 
             if (!error.isEmpty()) {
                 uploadedfile.delete();
+                logger.error("Failed parsing file preview {} uploaded by {}", fileName, loggedInUser.getUsername());
                 throw new BadRequestException("Invalid caff file");
             }
 
         } catch (IOException e) {
             uploadedfile.delete();
+            logger.error("Error while parsing file {} uploaded by {}: {}", fileName, loggedInUser.getUsername(), e.getMessage());
             throw new InternalServerErrorException("Error while parsing");
         }
 
@@ -230,6 +252,7 @@ public class FileService {
             node = mapper.readTree(input);
         } catch (JsonProcessingException e) {
             uploadedfile.delete();
+            logger.error("Error while parsing json file data for {} uploaded by {}: {}", fileName, loggedInUser.getUsername(), e.getMessage());
             throw new BadRequestException("Invalid caff file");
         }
 
@@ -245,6 +268,8 @@ public class FileService {
         );
 
         caffFileDataRepository.save(caffFileData);
+
+        logger.info("File uploaded by user {} saved as {}", loggedInUser.getUsername(), fileName);
 
         return CaffFileDataMapper.INSTANCE.fileToFileUploadResponse(caffFileData);
     }
@@ -270,6 +295,7 @@ public class FileService {
         );
 
         if (!file.exists()) {
+            logger.error("File {} not found", file);
             throw new NotFoundException("File not found");
         }
 
@@ -282,6 +308,8 @@ public class FileService {
         CaffFileData file = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
         file.getUsersPurchased().add(loggedInUser);
+
+        logger.info("File {} bought by user {}", file.getId(), loggedInUser.getUsername());
 
         caffFileDataRepository.save(file);
     }
