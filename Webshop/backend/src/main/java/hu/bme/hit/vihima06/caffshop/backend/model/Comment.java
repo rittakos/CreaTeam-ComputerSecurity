@@ -18,9 +18,11 @@ public class Comment {
     private Date date = new Date();
 
     @ManyToOne()
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne()
+    @JoinColumn(name = "caff_file_data_id")
     private CaffFileData caffFileData;
 
     public Comment() {

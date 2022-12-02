@@ -5,7 +5,6 @@ import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.config.Constants;
 import hu.bme.hit.vihima06.caffshop.backend.service.FileService;
 import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,8 +18,11 @@ import java.util.List;
 @RestController
 public class FilesController implements FilesApi {
 
-    @Autowired
-    private FileService fileService;
+    private final FileService fileService;
+
+    public FilesController(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Override
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

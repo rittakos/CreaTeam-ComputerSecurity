@@ -26,6 +26,7 @@ public class CaffFileData {
     private Date uploadDate = new Date();
 
     @ManyToOne()
+    @JoinColumn(name = "creator_id")
     private User creator;
 
     @ElementCollection

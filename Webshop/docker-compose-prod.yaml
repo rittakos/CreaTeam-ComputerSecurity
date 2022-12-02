@@ -5,6 +5,9 @@ services:
     image: traefik:v2.5
     restart: always
     container_name: caffshop-traefik
+    depends_on:
+      - caffshop
+      - caffshop-static
     ports:
       - "80:80"
       - "8085:8080"
@@ -84,11 +87,12 @@ services:
     container_name: caffshop
     depends_on:
       - caffshop-db
+      - parser-build
     command: "java -jar /usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
     environment:
       UPLOAD_FOLDER: "/usr/local/app/uploads"
       DATABASE_URL: "caffshop-db"
-      PARSER_APTH: "/usr/local/app/parser"
+      PARSER_PATH: "/usr/local/app/parser"
     volumes:
       - "./backend/target/caffshop.backend-0.0.1-SNAPSHOT.jar:/usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
       - "../Parser/build:/usr/local/app/parser"
