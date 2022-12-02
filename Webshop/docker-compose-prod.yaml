@@ -96,6 +96,7 @@ services:
     volumes:
       - "./backend/target/caffshop.backend-0.0.1-SNAPSHOT.jar:/usr/local/app/caffshop.backend-0.0.1-SNAPSHOT.jar"
       - "../Parser/build:/usr/local/app/parser"
+      - "./uploads:/usr/local/app/uploads"
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.auth.loadbalancer.server.port=8080"
