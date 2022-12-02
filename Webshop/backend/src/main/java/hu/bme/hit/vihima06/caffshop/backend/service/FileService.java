@@ -3,7 +3,6 @@ package hu.bme.hit.vihima06.caffshop.backend.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hu.bme.hit.vihima06.caffshop.backend.config.Constants;
 import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.*;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CaffFileDataMapper;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CommentMapper;
@@ -13,9 +12,9 @@ import hu.bme.hit.vihima06.caffshop.backend.model.User;
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CaffFileDataRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CommentRepository;
+import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -35,20 +34,31 @@ import static hu.bme.hit.vihima06.caffshop.backend.config.Constants.*;
 @Service
 public class FileService {
 
-    @Value("${caffshop.upload-folder}")
     private String uploadFolder;
 
-    @Value("${caffshop.parser-path}")
     private String parserPath;
 
-    @Autowired
-    private CaffFileDataRepository caffFileDataRepository;
+    private final CaffFileDataRepository caffFileDataRepository;
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
-    @Autowired
-    private LoggedInUserService loggedInUserService;
+    private final UserRepository userRepository;
+
+    private final LoggedInUserService loggedInUserService;
+
+    public FileService(@Value("${caffshop.upload-folder}") String uploadFolder, @Value("${caffshop.parser-path}") String parserPath, CaffFileDataRepository caffFileDataRepository, CommentRepository commentRepository, UserRepository userRepository, LoggedInUserService loggedInUserService) {
+        this.uploadFolder = uploadFolder;
+        this.parserPath = parserPath;
+        this.caffFileDataRepository = caffFileDataRepository;
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+        this.loggedInUserService = loggedInUserService;
+
+        File previewDirectory = new File(uploadFolder + File.separator + PREVIEW_FOLDER);
+        if (!previewDirectory.exists()) {
+            previewDirectory.mkdirs();
+        }
+    }
 
     public void deleteById(Integer id) {
         User loggedInUser = loggedInUserService.getLoggedInUser();
@@ -137,8 +147,11 @@ public class FileService {
     public FileDataDTO getCaffFileForDownloadById(Integer id) {
         User loggedInUser = loggedInUserService.getLoggedInUser();
 
-        // TODO check if file is bought
-        // new ForbiddenException("File is not bought")
+        User user = userRepository.findById(loggedInUser.getId()).orElseThrow(() -> new ForbiddenException("User not found"));
+
+        if (!user.getPurchasedCaffFiles().stream().anyMatch(f -> f.getId().equals(id)) && !user.getCaffFiles().stream().anyMatch(f -> f.getId().equals(id)) && !loggedInUserService.isAdmin()) {
+            throw new ForbiddenException("File not purchased");
+        }
 
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
@@ -164,8 +177,9 @@ public class FileService {
 
         String fileName = UUID.randomUUID().toString();
 
+        File uploadedfile;
         try {
-            File uploadfile = new File(
+            uploadedfile = new File(
                     uploadFolder
                             + File.separator
                             + CAFF_FOLDER
@@ -173,7 +187,7 @@ public class FileService {
                             + fileName
                             + CAFF_EXTENSION
             );
-            file.transferTo(uploadfile);
+            file.transferTo(uploadedfile);
         } catch (IOException e) {
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -192,6 +206,7 @@ public class FileService {
             input = stdInput.lines().collect(Collectors.joining());
 
             if (!error.isEmpty()) {
+                uploadedfile.delete();
                 throw new BadRequestException("Invalid caff file");
             }
 
@@ -200,10 +215,12 @@ public class FileService {
             error = stdError.lines().collect(Collectors.joining());
 
             if (!error.isEmpty()) {
+                uploadedfile.delete();
                 throw new BadRequestException("Invalid caff file");
             }
 
         } catch (IOException e) {
+            uploadedfile.delete();
             throw new InternalServerErrorException("Error while parsing");
         }
 
@@ -212,6 +229,7 @@ public class FileService {
         try {
             node = mapper.readTree(input);
         } catch (JsonProcessingException e) {
+            uploadedfile.delete();
             throw new BadRequestException("Invalid caff file");
         }
 

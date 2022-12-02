@@ -13,7 +13,6 @@ import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import hu.bme.hit.vihima06.caffshop.backend.service.util.EmailValidator;
 import hu.bme.hit.vihima06.caffshop.backend.service.util.UserValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,14 +22,17 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private LoggedInUserService loggedInUserService;
+    private final LoggedInUserService loggedInUserService;
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, LoggedInUserService loggedInUserService) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.loggedInUserService = loggedInUserService;
+    }
 
     public List<UserDetailsResponse> getAllUsers() {
         return userRepository.findAll().stream().map(u -> UserMapper.INSTANCE.userToUserDetailsResponse(u)).toList();

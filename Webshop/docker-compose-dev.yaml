@@ -5,6 +5,9 @@ services:
     image: traefik:v2.5
     restart: always
     container_name: caffshop-traefik
+    depends_on:
+      - caffshop
+      - caffshop-static
     ports:
       - "80:80"
       - "8085:8080"
@@ -85,6 +88,7 @@ services:
     working_dir: /usr/local/app
     depends_on:
       - caffshop-db
+      - parser-build
     command: "mvn clean spring-boot:run -DskipTests"
     environment:
       UPLOAD_FOLDER: "/usr/local/app/uploads"
@@ -111,7 +115,7 @@ networks:
   caffshop-internal:
     external: false
     name: caffshop-internal
-    
+
 volumes:
   caffshop-static:
     driver: local

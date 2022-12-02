@@ -4,7 +4,6 @@ import hu.bme.hit.vihima06.caffshop.backend.api.AdminApi;
 import hu.bme.hit.vihima06.caffshop.backend.models.ModifyUserRequest;
 import hu.bme.hit.vihima06.caffshop.backend.models.UserDetailsResponse;
 import hu.bme.hit.vihima06.caffshop.backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +14,11 @@ import java.util.List;
 @RestController
 public class AdminController implements AdminApi {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public AdminController(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
