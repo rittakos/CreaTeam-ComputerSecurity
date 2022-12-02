@@ -98,6 +98,7 @@ services:
       - "./backend/src:/usr/local/app/src"
       - "./backend/pom.xml:/usr/local/app/pom.xml"
       - "../Parser/build:/usr/local/app/parser"
+      - "./uploads:/usr/local/app/uploads"
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.caffshop.loadbalancer.server.port=8080"
