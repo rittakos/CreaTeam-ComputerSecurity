@@ -131,7 +131,7 @@ public class AuthService {
         }
 
         if (!UserValidator.validateUsername(registrationRequest.getUsername())) {
-            throw new BadRequestException("Error: Name should be at least 4 characters long!");
+            throw new BadRequestException("Error: Username should be at least 4 characters long!");
         }
 
         if (!EmailValidator.validateEmail(email)) {

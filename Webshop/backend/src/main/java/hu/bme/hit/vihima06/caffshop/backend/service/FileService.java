@@ -1,10 +1,10 @@
 package hu.bme.hit.vihima06.caffshop.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.bme.hit.vihima06.caffshop.backend.config.Constants;
-import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.BadRequestException;
-import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.ForbiddenException;
-import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.NotFoundException;
-import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.UnauthorizedException;
+import hu.bme.hit.vihima06.caffshop.backend.controller.exceptions.*;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CaffFileDataMapper;
 import hu.bme.hit.vihima06.caffshop.backend.mapper.CommentMapper;
 import hu.bme.hit.vihima06.caffshop.backend.model.CaffFileData;
@@ -13,7 +13,6 @@ import hu.bme.hit.vihima06.caffshop.backend.model.User;
 import hu.bme.hit.vihima06.caffshop.backend.models.*;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CaffFileDataRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.CommentRepository;
-import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.LoggedInUserService;
 import hu.bme.hit.vihima06.caffshop.backend.service.dto.FileDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +25,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static hu.bme.hit.vihima06.caffshop.backend.config.Constants.*;
 
 @Service
 public class FileService {
 
     @Value("${caffshop.upload-folder}")
     private String uploadFolder;
+
+    @Value("${caffshop.parser-path}")
+    private String parserPath;
 
     @Autowired
     private CaffFileDataRepository caffFileDataRepository;
@@ -55,7 +59,31 @@ public class FileService {
             throw new ForbiddenException("File access denied");
         }
 
-        // TODO delete caff file and preview as well
+        File caffFile = new File(
+                uploadFolder
+                        + File.separator
+                        + CAFF_FOLDER
+                        + File.separator
+                        + caffFileData.getStoredFileName()
+                        + CAFF_EXTENSION
+        );
+
+        if (caffFile.exists()) {
+            caffFile.delete();
+        }
+
+        File previewFile = new File(
+                uploadFolder
+                        + File.separator
+                        + PREVIEW_FOLDER
+                        + File.separator
+                        + caffFileData.getStoredFileName()
+                        + BMP_EXTENSION
+        );
+
+        if (previewFile.exists()) {
+            previewFile.delete();
+        }
 
         caffFileDataRepository.delete(caffFileData);
     }
@@ -114,13 +142,13 @@ public class FileService {
 
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
-        return getFileDataDTOByCaff(caffFileData, Constants.CAFF_FOLDER, Constants.CAFF_EXTENSION);
+        return getFileDataDTOByCaff(caffFileData, CAFF_FOLDER, CAFF_EXTENSION);
     }
 
     public FileDataDTO getPreviewFileDataById(Integer id) {
         CaffFileData caffFileData = caffFileDataRepository.findById(id).orElseThrow(() -> new NotFoundException("File not found"));
 
-        return getFileDataDTOByCaff(caffFileData, Constants.PREVIEW_FOLDER, Constants.BMP_EXTENSION);
+        return getFileDataDTOByCaff(caffFileData, PREVIEW_FOLDER, BMP_EXTENSION);
     }
 
     public FileUploadResponse uploadFile(String name, Double price, MultipartFile file) {
@@ -140,53 +168,77 @@ public class FileService {
             File uploadfile = new File(
                     uploadFolder
                             + File.separator
-                            + Constants.CAFF_FOLDER
+                            + CAFF_FOLDER
                             + File.separator
                             + fileName
-                            + Constants.CAFF_EXTENSION
+                            + CAFF_EXTENSION
             );
             file.transferTo(uploadfile);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InternalServerErrorException(e.getMessage());
         }
 
-        // TODO parse
         Runtime rt = Runtime.getRuntime();
-        String[] commands = { "/bin/bash", "-c", "cd /usr/local/app/parser/ && ./parser /usr/local/app/uploads/caffs/" + fileName + ".caff preview /usr/local/app/uploads/previews/" + fileName +".bmp" };
-        Process proc = null;
+        String[] dataCommand = { "/bin/bash", "-c", "cd " + parserPath + " && ./parser " + uploadFolder + File.separator + CAFF_FOLDER + File.separator + fileName + CAFF_EXTENSION + " " + PARSER_DATA };
+        String[] previewCommand = { "/bin/bash", "-c", "cd " + parserPath + " && ./parser " + uploadFolder + File.separator + CAFF_FOLDER + File.separator + fileName + CAFF_EXTENSION + " " + PARSER_PREVIEW + " " + uploadFolder + File.separator + PREVIEW_FOLDER + File.separator + fileName + BMP_EXTENSION };
+        String input;
         try {
-            proc = rt.exec(commands);
+            Process proc = rt.exec(dataCommand);
 
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
-            System.out.println("Here is the standard output of the command:");
-            String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
+            String error = stdError.lines().collect(Collectors.joining());
+            input = stdInput.lines().collect(Collectors.joining());
+
+            if (!error.isEmpty()) {
+                throw new BadRequestException("Invalid caff file");
             }
-            System.out.println("Here is the standard error of the command (if any):");
-            while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+
+            proc = rt.exec(previewCommand);
+            stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+            error = stdError.lines().collect(Collectors.joining());
+
+            if (!error.isEmpty()) {
+                throw new BadRequestException("Invalid caff file");
             }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new InternalServerErrorException("Error while parsing");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode node;
+        try {
+            node = mapper.readTree(input);
+        } catch (JsonProcessingException e) {
+            throw new BadRequestException("Invalid caff file");
         }
 
         CaffFileData caffFileData = new CaffFileData(
                 name,
                 fileName,
                 loggedInUser,
-                List.of("tags"),
-                1,
-                1,
+                jsonArrayToList(node.get("Tags")),
+                node.get("Width").asInt(),
+                node.get("Height").asInt(),
                 price,
-                1.0
+                node.get("Duration").asDouble() / 1000
         );
 
         caffFileDataRepository.save(caffFileData);
 
         return CaffFileDataMapper.INSTANCE.fileToFileUploadResponse(caffFileData);
+    }
+
+    private List<String> jsonArrayToList(JsonNode node) {
+        List<String> list = new ArrayList<>();
+        if (node.isArray()) {
+            for (final JsonNode objNode : node) {
+                list.add(objNode.asText());
+            }
+        }
+        return list;
     }
 
     private FileDataDTO getFileDataDTOByCaff(CaffFileData caffFileData, String folder, String extension) {

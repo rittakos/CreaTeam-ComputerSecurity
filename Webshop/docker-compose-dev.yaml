@@ -89,6 +89,7 @@ services:
     environment:
       UPLOAD_FOLDER: "/usr/local/app/uploads"
       DATABASE_URL: "caffshop-db"
+      PARSER_PATH: "/usr/local/app/parser"
     volumes:
       - "./backend/src:/usr/local/app/src"
       - "./backend/pom.xml:/usr/local/app/pom.xml"
