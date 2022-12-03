@@ -1,0 +1,126 @@
+version: "3.3"
+
+services:
+  caffshop-traefik:
+    image: traefik:v2.5
+    restart: always
+    container_name: caffshop-traefik
+    depends_on:
+      - caffshop
+      - caffshop-static
+    ports:
+      - "80:80"
+      - "8085:8080"
+    command:
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --api.debug=true
+      - --log.level=DEBUG
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=caffshop-web
+      - --entrypoints.web.address=:80
+      - --accessLog.filePath=/traefik/access.log
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik:/traefik
+    networks:
+      - caffshop-web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.service=api@internal"
+
+  frontend-build:
+    image: node:16-slim
+    container_name: frontend-build
+    working_dir: /usr/app
+    volumes:
+      - ./frontend/:/usr/app
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - npm install && npm run build
+    
+  caffshop-static:
+    image: httpd:2.4
+    restart: always
+    container_name: caffshop-static
+    depends_on:
+      - "frontend-build"
+    volumes:
+      - ./frontend/dist/frontend:/usr/local/apache2/htdocs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.root.entrypoints=web"
+      - "traefik.http.routers.root.rule=Path(`/`)"
+      - "traefik.http.routers.static.entrypoints=web"
+      - "traefik.http.routers.static.rule=Path(`/{[\\.a-zA-Z0-9]+\\.{1}(js|css|ico|html){1}}`)"
+      - "traefik.http.routers.assets.entrypoints=web"
+      - "traefik.http.routers.assets.rule=PathPrefix(`/assets`)"
+    networks:
+      - caffshop-web
+
+  parser-build:
+    image: maven:3.8-eclipse-temurin-17
+    container_name: parser-build
+    working_dir: /build
+    volumes:
+      - ../Parser:/build
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - apt-get update && apt install gcc -y && apt install g++ -y && apt install make -y && apt install cmake -y && cd build && cmake .. && cmake --build .
+
+  caffshop-db:
+    image: mysql:8.0
+    restart: always
+    container_name: caffshop-db
+    environment:
+      MYSQL_DATABASE: "caffshop"
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - caffshop-internal
+
+  caffshop:
+    image: maven:3.8-eclipse-temurin-17
+    restart: always
+    container_name: caffshop
+    working_dir: /usr/local/app
+    depends_on:
+      - caffshop-db
+      - parser-build
+    command: "mvn clean spring-boot:run -DskipTests"
+    environment:
+      UPLOAD_FOLDER: "/usr/local/app/uploads"
+      DATABASE_URL: "caffshop-db"
+      PARSER_PATH: "/usr/local/app/parser"
+    volumes:
+      - "./backend/src:/usr/local/app/src"
+      - "./backend/pom.xml:/usr/local/app/pom.xml"
+      - "../Parser/build:/usr/local/app/parser"
+      - "./uploads:/usr/local/app/uploads"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.caffshop.loadbalancer.server.port=8080"
+      - "traefik.http.routers.caffshop.entrypoints=web"
+      - "traefik.http.routers.caffshop.rule=PathPrefix(`/api`)"
+      - "traefik.docker.network=caffshop-web"
+    networks:
+      - caffshop-web
+      - caffshop-internal
+
+networks:
+  caffshop-web:
+    external: false
+    name: caffshop-web
+  caffshop-internal:
+    external: false
+    name: caffshop-internal
+
+volumes:
+  caffshop-static:
+    driver: local
+  caffshop:
+    driver: local
+  caffshop-db:
+    driver: local

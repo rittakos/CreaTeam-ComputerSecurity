@@ -7,7 +7,7 @@ info:
     name: KreaTeam
     url: 'https://github.com/rittakos/KreaTeam-ComputerSecurity'
 servers:
-  - url: 'http://localhost:8080'
+  - url: 'http://localhost:8080/api'
 paths:
   /auth/login:
     post:
@@ -180,7 +180,7 @@ paths:
         required: true
     put:
       summary: ''
-      operationId: post-files-modify-id
+      operationId: put-files-modify-id
       responses:
         '200':
           description: OK
@@ -198,7 +198,74 @@ paths:
               $ref: '#/components/schemas/ModifyCaffRequest'
       tags:
         - files
-  /admin/modifyUser:
+  '/files/preview/{id}':
+    get:
+      summary: Your GET endpoint
+      tags:
+        - files
+      responses:
+        '200':
+          description: OK
+          content:
+            image/bmp:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not Found
+      operationId: get-files-preview
+      description: file preview download
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  '/files/download/{id}':
+    get:
+      summary: Your GET endpoint
+      tags:
+        - files
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not Found
+      operationId: get-files-download
+      description: download a caff file
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  /files/upload:
+    post:
+      summary: ''
+      operationId: post-files-upload
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          description: Bad Request
+      description: upoad caff file
+      tags:
+        - files
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUploadRequest'
+  '/admin/modifyUser/{id}':
     put:
       summary: ''
       operationId: put-admin-modifyUser
@@ -219,6 +286,44 @@ paths:
               $ref: '#/components/schemas/ModifyUserRequest'
       tags:
         - admin
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+  /admin/users:
+    get:
+      summary: Your GET endpoint
+      tags:
+        - admin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDetailsResponse'
+      operationId: get-admin-users
+      description: list all users for the admin
+  '/files/buy/{id}':
+    parameters:
+      - schema:
+          type: integer
+        name: id
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-files-buy-id
+      responses:
+        '201':
+          description: Created
+      description: Buy a caff file
+      tags:
+        - files
 components:
   schemas:
     RegistrationRequest:
@@ -298,6 +403,7 @@ components:
           format: date-time
         price:
           type: number
+          format: double
       required:
         - id
         - name
@@ -317,8 +423,6 @@ components:
           type: array
           items:
             type: string
-        description:
-          type: string
         size:
           type: object
           required:
@@ -331,12 +435,17 @@ components:
               type: integer
         price:
           type: number
+          format: double
         creator:
           $ref: '#/components/schemas/PublicUserDetailsResponse'
         comments:
           type: array
           items:
             $ref: '#/components/schemas/CommentResponse'
+        duration:
+          type: number
+        purchased:
+          type: boolean
       required:
         - id
         - name
@@ -347,6 +456,8 @@ components:
         - price
         - creator
         - comments
+        - duration
+        - purchased
     PublicUserDetailsResponse:
       title: PublicUserDetailsResponse
       type: object
@@ -433,6 +544,30 @@ components:
         - username
         - email
         - roles
+    FileUploadRequest:
+      title: FileUploadRequest
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: number
+          format: double
+        file:
+          type: string
+          format: binary
+      required:
+        - name
+        - price
+        - file
+    FileUploadResponse:
+      title: FileUploadResponse
+      type: object
+      properties:
+        id:
+          type: integer
+      required:
+        - id
 tags:
   - name: admin
   - name: auth

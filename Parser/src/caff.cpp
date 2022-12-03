@@ -222,6 +222,43 @@ void Caff::setData()
 		data.width = animations[0].ciff.header.width;
 		data.height = animations[0].ciff.header.height;
 	}
+
+	std::stringstream ss;
+	ss << credits.year << ".";
+	ss << credits.month << ".";
+	ss << credits.day << ". ";
+	ss << credits.hour << ":";
+	ss << credits.minute;
+	data.creationTime = ss.str();
+}
+
+MetaData Caff::getMetaData() const
+{
+	MetaData dt;
+
+	dt.fileName = this->data.filePath;
+	dt.creator = this->data.creator;
+	dt.creationTime = this->data.creationTime;
+
+
+	dt.duration = this->data.duration;
+	dt.animCount = this->data.animCount;
+	dt.width = this->data.width;
+	dt.height = this->data.height;
+
+	for (const AnimationBlock& a : animations)
+	{
+		std::string caption = a.ciff.header.caption;
+		if (!std::count(dt.captions.begin(), dt.captions.end(), caption))
+			dt.captions.push_back(caption);
+		for (std::string tag : a.ciff.header.tags)
+		{
+			if (!std::count(dt.tags.begin(), dt.tags.end(), tag))
+				dt.tags.push_back(tag);
+		}
+	}
+
+	return dt;
 }
 
 Error Caff::load(std::string path)
@@ -257,7 +294,7 @@ std::string Caff::dataToString() const
 {
 	std::string result = "";
 	
-	data.write(std::cout);
+	result = data.toString();
 
 	return result;
 }
@@ -269,11 +306,27 @@ Caff::~Caff()
 		is->close();
 }
 
-void Data::write(std::ostream& os) const
+std::string Data::toString() const
 {
+	std::string result = "";
+	std::ostream& os = std::cout;
+
+	/*result += "Path: " + this->filePath;
+	result += "\n";
+	result += "Creator: " + creator;
+	result += "W: " + width;
+	result += "\t H: " + height;
+	result += "\n";
+	result += "Duration: " + duration;
+	result += "\n";
+	result += "Animations: " + animCount;
+	result += "\n";*/
+
 	os << "Path: " << this->filePath << std::endl;
 	os << "Creator: " << creator << std::endl;
 	os << "W: " << width << "\t H: " << height << std::endl;
 	os << "Duration: " << duration << std::endl;
 	os << "Animations: " << animCount << std::endl;
+
+	return result;
 }

@@ -2,8 +2,8 @@ package hu.bme.hit.vihima06.caffshop.backend.model;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "roles")
+@Entity(name = "Role")
+@Table(name = "role")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

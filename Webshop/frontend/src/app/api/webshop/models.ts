@@ -11,3 +11,5 @@ export { CommentResponse } from './models/comment-response';
 export { ModifyCaffRequest } from './models/modify-caff-request';
 export { ModifyUserRequest } from './models/modify-user-request';
 export { UserDetailsResponse } from './models/user-details-response';
+export { FileUploadRequest } from './models/file-upload-request';
+export { FileUploadResponse } from './models/file-upload-response';

@@ -19,7 +19,9 @@ import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.security.jwt.JwtUtils;
 import hu.bme.hit.vihima06.caffshop.backend.security.service.UserDetailsImpl;
 import hu.bme.hit.vihima06.caffshop.backend.service.util.EmailValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import hu.bme.hit.vihima06.caffshop.backend.service.util.UserValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,23 +43,30 @@ import java.util.*;
 @EnableScheduling
 public class AuthService {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    @Autowired
-    UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    final
     JwtUtils jwtUtils;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, RefreshTokenRepository refreshTokenRepository, JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+        logger.info("Initialized");
+    }
 
     public LoginResponse login(LoginRequest loginRequest) {
         Authentication authentication;
@@ -66,6 +75,7 @@ public class AuthService {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase().trim(), loginRequest.getPassword()));
         } catch (AuthenticationException e) {
+            logger.error("Login failed with username {}", loginRequest.getUsername());
             throw new UnauthorizedException("User not found");
         }
 
@@ -74,8 +84,13 @@ public class AuthService {
         String jwt = jwtUtils.generateJwtToken(userDetails);
         String refreshJwt = jwtUtils.generateJwtRefreshToken(userDetails);
 
-        User user = userRepository.findById(((UserDetailsImpl) authentication.getPrincipal()).getId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        Integer userId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    logger.error("Login failed: user not found by id: {}", userId);
+                    return new NotFoundException("User not found");
+                });
 
         saveRefreshToken(refreshJwt, user);
 
@@ -83,6 +98,8 @@ public class AuthService {
         loginResponse.setUserDetails(UserMapper.INSTANCE.userToUserDetailsResponse(user));
         loginResponse.setAccessToken(jwt);
         loginResponse.setRefreshToken(refreshJwt);
+
+        logger.info("User {} logged in successfully", user.getUsername());
 
         return loginResponse;
     }
@@ -98,6 +115,7 @@ public class AuthService {
         Optional<RefreshToken> storedToken = refreshTokenRepository.findFirstByTokenHashAndUserId(hashOfJwtToken, userId);
 
         if (storedToken.isEmpty()) {
+            logger.error("Refresh token not found for user id {}", userId);
             throw new UnauthorizedException("Wrong refresh token");
         }
 
@@ -105,7 +123,10 @@ public class AuthService {
 
         String username = jwtUtils.getUsernameFromJwtRefreshToken(refreshToken);
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UnauthorizedException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            logger.error("Token refresh failed: user not found by username: {}", username);
+            return new UnauthorizedException("User not found");
+        });
 
         UserDetailsImpl userDetails = UserDetailsImpl.build(user);
 
@@ -118,6 +139,8 @@ public class AuthService {
 
         saveRefreshToken(refreshJwt, user);
 
+        logger.info("User {} token refreshed successfully", user.getUsername());
+
         return newTokenResponse;
     }
 
@@ -125,20 +148,24 @@ public class AuthService {
     public void register(RegistrationRequest registrationRequest) {
         String email = registrationRequest.getEmail().toLowerCase();
 
-        if (registrationRequest.getName().trim().length() < 3) {
-            throw new BadRequestException("Error: Name should be at least 3 characters long!");
+        if (!UserValidator.validateName(registrationRequest.getName())) {
+            throw new BadRequestException("Error: Name should be at least 4 characters long!");
         }
 
-        if (registrationRequest.getUsername().trim().length() < 3) {
-            throw new BadRequestException("Error: Name should be at least 3 characters long!");
+        if (!UserValidator.validateUsername(registrationRequest.getUsername())) {
+            throw new BadRequestException("Error: Username should be at least 4 characters long!");
         }
 
         if (!EmailValidator.validateEmail(email)) {
             throw new BadRequestException("Error: Email is invalid!");
         }
 
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new BadRequestException("Error: Email is already in use!");
+        }
+
+        if (userRepository.existsByUsername(registrationRequest.getUsername())) {
+            throw new BadRequestException("Error: Username is already in use!");
         }
 
         if (registrationRequest.getPassword().length() < 8) {
@@ -154,13 +181,21 @@ public class AuthService {
         Optional<Role> role = roleRepository.findByName(ERole.ROLE_USER);
 
         if (role.isEmpty()) {
+            logger.info("No roles, creating them now");
             roleRepository.saveAllAndFlush(List.of(new Role(ERole.ROLE_ADMIN), new Role(ERole.ROLE_USER)));
             roles.add(roleRepository.findByName(ERole.ROLE_ADMIN)
-                    .orElseThrow(() -> new InternalServerErrorException("Error: Role is not found.")));
+                    .orElseThrow(() -> {
+                        logger.error("Role {} not found duing registration", ERole.ROLE_ADMIN);
+                        return new InternalServerErrorException("Error: Role is not found.");
+                    }));
+            logger.info("Role {} added to new user {}", ERole.ROLE_ADMIN, registrationRequest.getUsername());
         }
 
         roles.add(roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new InternalServerErrorException("Error: Role is not found.")));
+                .orElseThrow(() -> {
+                    logger.error("Role {} not found duing registration", ERole.ROLE_USER);
+                    return new InternalServerErrorException("Error: Role is not found.");
+                }));
 
         User user = new User(
                 registrationRequest.getName().trim(),
@@ -169,6 +204,8 @@ public class AuthService {
                 passwordEncoder.encode(registrationRequest.getPassword()),
                 roles
         );
+
+        logger.info("User {} registered successfully", registrationRequest.getUsername());
 
         userRepository.save(user);
     }
@@ -190,6 +227,7 @@ public class AuthService {
             byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             return String.copyValueOf(Hex.encode(hash));
         } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -197,7 +235,9 @@ public class AuthService {
 
     @Scheduled(cron = "0 3 * * * ?", zone = "Europe/Budapest")
     protected void clearExpiredRefreshTokens() {
+        logger.info("Deleting expired refrest tokens");
         List<RefreshToken> expired = refreshTokenRepository.findByExpirationLessThan(new Date());
         refreshTokenRepository.deleteAllInBatch(expired);
+        logger.info("Deleted {} refresh tokens", expired.size());
     }
 }
