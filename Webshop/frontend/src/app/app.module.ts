@@ -40,7 +40,6 @@ const API_INTERCEPTOR_PROVIDER: Provider = {
     FormsModule,
     HttpClientModule,
     ApiModule.forRoot({ rootUrl: '/api' }),
-    FormsModule,
     ReactiveFormsModule
   ],
   providers: [
