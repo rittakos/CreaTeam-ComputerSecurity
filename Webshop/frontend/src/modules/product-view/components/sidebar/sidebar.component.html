@@ -1,0 +1,20 @@
+<div class="details__sidebar">
+  <div class="sidebar__get-file">
+    <div class="get-file__price">
+      {{price | currency:'USD'}}
+    </div>
+    <div class="get-file__button">
+      <button *ngIf="purchased; else productOwned" (click)="onDownloadClicked()">Download</button>
+      <ng-template #productOwned>
+        <button (click)="onBuyClicked()">Buy</button>
+      </ng-template>
+    </div>
+  </div>
+  <div class="sidebar__user">
+    <img class="user_image" src="assets/images/user_image.png" alt="user photo">
+    <p>{{creator.name}}</p>
+  </div>
+  <div class="sidebar__date">
+    Uploaded on {{uploadDate | date:'short'}}
+  </div>
+</div>

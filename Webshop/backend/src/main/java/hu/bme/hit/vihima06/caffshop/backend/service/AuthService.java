@@ -233,7 +233,7 @@ public class AuthService {
         }
     }
 
-    @Scheduled(cron = "0 3 * * * ?", zone = "Europe/Budapest")
+    @Scheduled(cron = "0 0 3 * * *", zone = "Europe/Budapest")
     protected void clearExpiredRefreshTokens() {
         logger.info("Deleting expired refrest tokens");
         List<RefreshToken> expired = refreshTokenRepository.findByExpirationLessThan(new Date());

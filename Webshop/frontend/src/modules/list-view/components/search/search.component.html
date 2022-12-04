@@ -1,0 +1,4 @@
+<form [formGroup]="searchForm" (ngSubmit)="onSearchSubmit()" class="search-box">
+  <div>Name: <input type="text" [formControl]="nameSearch"></div>
+  <button class="search-button">Search!</button>
+</form>

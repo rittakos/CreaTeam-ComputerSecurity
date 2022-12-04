@@ -105,7 +105,7 @@ public class FileService {
 
         caffFileDataRepository.delete(caffFileData);
 
-        logger.info("File {} deleted by user ", id, loggedInUser.getUsername());
+        logger.info("File {} deleted by user {}", id, loggedInUser.getUsername());
     }
 
     public CaffDetailsResponse getFileDetailsById(Integer id) {

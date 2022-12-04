@@ -1,0 +1,30 @@
+.file {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  justify-content: space-between;
+}
+
+.file__data {
+  margin-right: 40px;
+  width: 30%;
+}
+
+.trash-image {
+  width: 10px;
+}
+
+.trash-button {
+  background-color: firebrick;
+  border-radius: 5px;
+}
+
+.trash-button:hover {
+  background-color: indianred;
+}
+
+.data__container {
+  display: flex;
+  width: 80%;
+  flex-direction: row;
+}

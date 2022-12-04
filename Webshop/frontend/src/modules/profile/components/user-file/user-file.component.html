@@ -1,0 +1,10 @@
+<div class="file">
+  <div class="data__container">
+    <div class="file__data">{{file.name}}</div>
+    <div class="file__data">{{file.uploadDate | date }}</div>
+    <div *ngIf="file.creator" class="file__data">{{file.creator}}</div>
+  </div>
+
+  <button class="trash-button" (click)="onDeleteFile()"><img src="assets/images/bin.png" class="trash-image" alt="delete_icon"></button>
+</div>
+

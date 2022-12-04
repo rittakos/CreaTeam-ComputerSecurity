@@ -1,0 +1,21 @@
+<div class="details__data">
+  <div class="details-data__product-name">
+      {{product.name}}
+  </div>
+  <div class="details-data__img">
+<!--    <img src="assets/images/0.jpg" alt="kep">-->
+    <img [src]="image" class="image" alt="preview_image">
+  </div>
+  <div class="details-data__size-duration">
+    <div class="size-duration__size">
+      Size: {{product.size.width}} x {{product.size.height}}
+    </div>
+    <div class="size-duration__duration">
+      Duration: {{product.duration}}
+    </div>
+  </div>
+  <div class="details-data__tags">
+    Tags:
+    <ng-container *ngFor="let tag of product.tags"> {{tag}}</ng-container>
+  </div>
+</div>
