@@ -32,7 +32,7 @@ export class DetailsContainerComponent implements OnInit {
     })
   }
 
-  createImageFromBlob(image: Blob) {
+  private createImageFromBlob(image: Blob) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       this.image = reader.result;
@@ -43,7 +43,7 @@ export class DetailsContainerComponent implements OnInit {
     }
   }
 
-  refreshProduct(id: number): void {
+  private refreshProduct(id: number): void {
     this.fileService.getFileDetails({id: id}).subscribe({
       next: resp => this.product = resp
     })
@@ -63,7 +63,7 @@ export class DetailsContainerComponent implements OnInit {
     })
   }
 
-  downloadFile(response: Blob): void {
+  private downloadFile(response: Blob): void {
     const url = window.URL.createObjectURL(response);
     window.open(url);
   }

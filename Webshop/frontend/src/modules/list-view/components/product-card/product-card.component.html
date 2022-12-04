@@ -1,6 +1,6 @@
 <div class="card">
   <p class="card__product-name">{{product.name}}</p>
-  <p><img [src]="renderedImage" alt="preview_image" class="card__image"></p>
+  <p><img [src]="renderedImage ?? '' " alt="preview_image" class="card__image"></p>
   <p class="card__product-upload">Uploaded: {{product.uploadDate | date }}</p>
   <p class="card__product-price">{{product.price | currency: 'USD'}}</p>
 </div>

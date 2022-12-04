@@ -1,3 +1,6 @@
+<div class="search-bar">
+<search (submitSearch)="submitSearch($event)" ></search>
+</div>
 <product-list
   *ngIf="products && images"
   [products]="products"

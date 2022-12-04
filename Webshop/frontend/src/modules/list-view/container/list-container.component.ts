@@ -17,13 +17,26 @@ export class ListContainerComponent implements OnInit {
   ngOnInit(): void {
     this.fileService.getFilesSearch().subscribe({
       next: files => {
-        this.products = files
-        this.products.forEach(file => {
-          this.fileService.getFilesPreview({id: file.id}).subscribe({
-            next: resp => this.images?.push({id: file.id, image: resp})
-          })
-        })
+        this.products = files;
+        this.loadImages();
       },
     });
+  }
+
+  submitSearch(name: string): void {
+    this.fileService.getFilesSearch({query: name}).subscribe({
+      next: resp => {
+        this.products = resp;
+        this.loadImages();
+      }
+    })
+  }
+
+  private loadImages(): void {
+    this.products!.forEach(file => {
+      this.fileService.getFilesPreview({id: file.id}).subscribe({
+        next: resp => this.images?.push({id: file.id, image: resp})
+      })
+    })
   }
 }

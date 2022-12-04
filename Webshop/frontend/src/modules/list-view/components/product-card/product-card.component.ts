@@ -16,7 +16,7 @@ export class ProductCardComponent implements OnInit {
     this.createImageFromBlob(this.image);
   }
 
-  createImageFromBlob(image: Blob) {
+  private createImageFromBlob(image: Blob) {
     let reader = new FileReader();
     reader.addEventListener("load", () => {
       this.renderedImage = reader.result;

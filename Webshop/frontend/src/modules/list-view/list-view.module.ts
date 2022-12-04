@@ -5,6 +5,7 @@ import {CurrencyPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
 import {RouterModule, Routes} from "@angular/router";
 import {SearchComponent} from "./components/search/search.component";
 import {ListContainerComponent} from "./container/list-container.component";
+import {ReactiveFormsModule} from "@angular/forms";
 
 const routes: Routes = [
   {
@@ -19,7 +20,8 @@ const routes: Routes = [
     NgIf,
     RouterModule.forChild(routes),
     CurrencyPipe,
-    DatePipe
+    DatePipe,
+    ReactiveFormsModule
   ],
   declarations: [
     ListContainerComponent,
