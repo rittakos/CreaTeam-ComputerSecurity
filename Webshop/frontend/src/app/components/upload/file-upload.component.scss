@@ -56,6 +56,11 @@ input[type=number] {
             background-color: $base-darker-green;
         }
 
+        button:disabled {
+            background-color: lightgray;
+            color: black;
+        }
+
         h2 {
             font-size: 0.80rem;
             max-width: fit-content;
@@ -64,6 +69,11 @@ input[type=number] {
 
         #file-select-btn {
             margin-top: 0rem;
+        }
+
+        ul {
+            margin-top: 1rem;
+            font-size: smaller;
         }
 
     }

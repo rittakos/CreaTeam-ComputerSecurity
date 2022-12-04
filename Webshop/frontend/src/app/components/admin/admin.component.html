@@ -1,0 +1,18 @@
+<div id="user-card" *ngFor="let user of users" (click)="selectUser(user)">
+    <h2>Name: {{user.name}}</h2>
+    <h2>Username: {{user.username}}</h2>
+    <h2>Email: {{user.email}}</h2>
+    <h2>Roles: {{user.roles}}</h2>
+</div>
+
+<div id="overlay" *ngIf="userSelected" >
+    <h2>Name: {{selectedUser.name}}</h2>
+    <h2>Username: {{selectedUser.username}}</h2>
+    <h2>Email: {{selectedUser.email}}</h2>
+    <h2>Roles: {{selectedUser.roles}}</h2>
+    <div [formGroup]="formGroup">
+        <input type="checkbox" [checked]="isAdmin" formControlName="adminCheckbox"> Admin
+    
+         <button (click)="closeUser()">Mentés</button>
+    </div>
+</div>
