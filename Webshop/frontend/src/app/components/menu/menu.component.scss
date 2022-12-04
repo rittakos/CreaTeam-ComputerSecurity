@@ -1,0 +1,37 @@
+.nav-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  border: chartreuse 1px solid;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.nav-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 900px;
+}
+
+.nav-button {
+  text-decoration: none;
+  padding: 5px;
+  border-radius: 3px;
+  border: chartreuse 1px solid;
+  background-color: rgba(127, 255, 0, 0.25);
+}
+
+.nav-button:hover {
+  background-color: rgba(127, 255, 0, 0.09);
+}
+
+.auth-buttons {
+  width: 150px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

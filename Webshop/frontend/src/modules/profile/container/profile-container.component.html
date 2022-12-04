@@ -1,0 +1,10 @@
+<div class="profile__title">My profile</div>
+<ng-container *ngIf="userData">
+  <user-data [user]="userData"></user-data>
+</ng-container>
+<ng-container *ngIf="userFiles">
+  <user-file-list
+    [files]="userFiles"
+    (deleteFile)="onFileDeleteSubmit($event)"
+  ></user-file-list>
+</ng-container>

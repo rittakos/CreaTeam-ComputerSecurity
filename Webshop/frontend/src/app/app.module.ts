@@ -12,6 +12,7 @@ import {LoginComponent} from './components/auth/login/login.component';
 import {RegisterComponent} from './components/auth/register/register.component';
 import {HomeComponent} from './components/home/home.component';
 import {ListViewModule} from "../modules/list-view/list-view.module";
+import {MenuComponent} from "./components/menu/menu.component";
 
 const API_INTERCEPTOR_PROVIDER: Provider = {
   provide: HTTP_INTERCEPTORS,
@@ -25,7 +26,8 @@ const API_INTERCEPTOR_PROVIDER: Provider = {
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
