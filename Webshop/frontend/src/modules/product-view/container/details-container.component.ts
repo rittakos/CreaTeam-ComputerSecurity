@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {FilesService} from "../../../app/api/webshop/services/files.service";
 import {CaffDetailsResponse} from "../../../app/api/webshop/models/caff-details-response";
 import {CommentService} from "../../../app/api/webshop/services/comment.service";
+import { HttpHeaders } from "@angular/common/http";
 
 
 @Component({
@@ -58,14 +59,25 @@ export class DetailsContainerComponent implements OnInit {
   }
 
   onDownloadProduct(): void {
-    this.fileService.getFilesDownload({id: this.id}).subscribe({
-      next: resp => this.downloadFile(resp)
+    this.fileService.getFilesDownload$Response({id: this.id}).subscribe({
+      next: resp => this.downloadFile(resp.body, resp.headers)
     })
   }
 
-  private downloadFile(response: Blob): void {
+  private downloadFile(response: Blob, headers: HttpHeaders): void {
+    let filename = (this.product?.name || 'unknown') + '.caff';
+    const contentDisposition = headers.get('content-disposition');
+    if (contentDisposition) {
+      const search = 'filename="';
+      filename = contentDisposition.substring(contentDisposition.indexOf(search) + search.length, contentDisposition.length - 1);
+    }
     const url = window.URL.createObjectURL(response);
-    window.open(url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    console.log(a.download)
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 
   onCommentSubmit(text: string): void {
