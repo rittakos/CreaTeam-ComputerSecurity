@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class Admin {
+public class File {
 
     @Autowired
     MockMvc mockMvc;
@@ -90,8 +90,18 @@ public class Admin {
     }
 
     @Test
-    void adminCanAccessUserList() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/admin/users")
+    void userSearchFile() throws Exception {
+        RequestBuilder request = MockMvcRequestBuilders.get("/files/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + userAccessToken);
+
+        mockMvc.perform(request).andExpect(status().isOk());
+    }
+
+    @Test
+    void adminSearchFile() throws Exception {
+        RequestBuilder request = MockMvcRequestBuilders.get("/files/search")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminAccessToken);
@@ -100,32 +110,12 @@ public class Admin {
     }
 
     @Test
-    void userCanNotAccessUserList() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/admin/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + userAccessToken);
-
-        mockMvc.perform(request).andExpect(status().isForbidden());
-    }
-
-    @Test
-    void adminModifyUser() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.put("/admin/modifyUser/1")
+    void upload() throws Exception {
+        RequestBuilder request = MockMvcRequestBuilders.post("/files/upload")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminAccessToken);
 
-        mockMvc.perform(request).andExpect(status().isOk());
-    }
-
-    @Test
-    void userCanNotModifyUser() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.put("/admin/modifyUser/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + userAccessToken);
-
-        mockMvc.perform(request).andExpect(status().isForbidden());
+        mockMvc.perform(request).andExpect(status().isCreated());
     }
 }
