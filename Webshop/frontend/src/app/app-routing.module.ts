@@ -8,6 +8,8 @@ import { HomeComponent } from './components/home/home.component';
 const routes: Routes = [
   { path: '', component: HomeComponent, data: { requiresLogin: true, redirectTo: '/auth' }, canActivate: [ AccessGuard ] },
   { path: 'auth', component: AuthComponent, data: { requiresLogout: true, redirectTo: '/' }, canActivate: [ AccessGuard ], runGuardsAndResolvers: 'always' },
+  { path: 'summary', loadChildren: () => import('../modules/list-view/list-view.module').then(m => m.ListViewModule)},
+  { path: 'products', loadChildren: () => import('../modules/product-view/details.module').then(m => m.DetailsModule)}
 ];
 
 @NgModule({

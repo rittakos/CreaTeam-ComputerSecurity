@@ -3,7 +3,7 @@ module.exports = [
     context: [
       "/api",
     ],
-    target: "http://localhost:8080",
+    target: "http://caffshop.webredirect.org/",
     secure: false,
   }
 ]

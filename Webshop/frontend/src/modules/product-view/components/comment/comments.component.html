@@ -1,0 +1,23 @@
+<div class="comments">
+  <div class="comments__title">Comments</div>
+  <div class="comment-from">
+    <form [formGroup]="commentForm" (ngSubmit)="onCommentSubmit()">
+      <div class="comment-form__header">
+        <div>Add comment</div>
+        <button class="comment-form__button">Send!</button>
+      </div>
+      <textarea [formControl]="commentText" type="text" class="comment-form__comment-text"></textarea>
+    </form>
+  </div>
+  <ng-container *ngFor="let comment of comments">
+    <div class="comment-box">
+      <div class="comment-box__header">
+        <div class="header__name">{{comment.user.name}}</div>
+        <div class="header__time">{{comment.date | date}}</div>
+      </div>
+      <div class="comment-box__text">
+        {{comment.comment}}
+      </div>
+    </div>
+  </ng-container>
+</div>
