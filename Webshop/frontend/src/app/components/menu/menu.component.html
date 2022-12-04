@@ -1,8 +1,7 @@
 <nav class="nav-bar">
 <ng-container *ngIf="loggedIn; else loggedOut">
   <div class="nav-buttons">
-    <a [routerLink]="['/']" class="nav-button">Home</a>
-    <a [routerLink]="'/summary'" class="nav-button">File browser</a>
+    <a [routerLink]="['/']" class="nav-button">File browser</a>
     <a [routerLink]="'/profile'" class="nav-button">My profile</a>
   </div>
   <div class="auth-buttons">

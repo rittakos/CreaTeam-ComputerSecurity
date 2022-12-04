@@ -16,7 +16,7 @@
         <div class="header__time">{{comment.date | date}}</div>
       </div>
       <div class="comment-box__text">
-        {{comment.comment}}
+        <div *ngFor="let line of comment.comment.split('\n')">{{ line }}</div>
       </div>
     </div>
   </ng-container>
