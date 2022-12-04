@@ -69,7 +69,7 @@ public class UserService {
 
         User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
 
-        user.setName(modifyUserRequest.getEmail());
+        user.setName(modifyUserRequest.getName());
         user.setEmail(modifyUserRequest.getEmail());
 
         Set<Role> roles = roleRepository.findAllByNameIn(parsedRoles);
