@@ -1,0 +1,51 @@
+$base-green: #B2E95D;
+$base-darker-green: #91BE4C;
+
+#login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    button {
+        margin-top: 2rem;
+        width: 191px;
+        height: 2rem;
+        border-radius: 15% / 45%;
+        border: none;
+        background-color: $base-green;
+    }
+
+    button:hover {
+        background-color: $base-darker-green;
+    }
+
+    form {
+        display: grid;
+        gap: 0.5rem;
+    
+        label {
+            margin-top: 1rem;
+            font-size: smaller;
+        }
+
+        input {
+            width: max-content;
+            height: 2rem;
+            border-radius: 15% / 45%;
+            border: solid 0.15rem $base-green;
+            padding-left: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border: solid 0.15rem $base-darker-green;
+        }
+
+        button {
+            width: 100%;
+        }
+
+    }
+}

@@ -1,25 +1,42 @@
-<div>
+<div id="register-container">
+  <h1>Registration</h1>
   <form (ngSubmit)="onRegister()">
-      <div class="w-100">
-          <label>Name</label>
-          <input placeholder="Name" name="name" [(ngModel)]="name">
-      </div>
-      <div class="w-100">
-          <label>Username</label>
-          <input placeholder="Username" name="username" [(ngModel)]="username">
-      </div>
-      <div class="w-100">
-          <label>Email</label>
-          <input placeholder="Email" name="email" [(ngModel)]="email">
-      </div>
-      <div class="w-100">
-          <label>Password</label>
-          <input type="password" placeholder="Password" name="password" [(ngModel)]="password">
-      </div>
-      <div class="w-100">
-          <label>Confirm password</label>
-          <input type="password" placeholder="Password" name="confirmPassword" [(ngModel)]="confirmPassword">
-      </div>
+
+        <label>Name</label>
+        <input placeholder="Name" name="name" [(ngModel)]="name" required minlength={{minNameLength}} #nameInput="ngModel">
+        <ul *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+          <li *ngIf="nameInput.errors?.['required']">The name field is required.</li>
+          <li *ngIf="nameInput.errors?.['minlength']">It has to be at least 4 character long.</li>
+        </ul>
+
+        <label>Username</label>
+        <input placeholder="Username" name="username" [(ngModel)]="username" required minlength={{minNameLength}} #userNameInput="ngModel">
+        <ul *ngIf="userNameInput.invalid && (userNameInput.dirty || userNameInput.touched)">
+          <li *ngIf="userNameInput.errors?.['required']">The username field is required.</li>
+          <li *ngIf="userNameInput.errors?.['minlength']">It has to be at least 4 character long.</li>
+        </ul>
+
+        <label>Email</label>
+        <input placeholder="Email" name="email" [(ngModel)]="email" required pattern={{emailPattern}} #emailInput="ngModel">
+        <ul *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+          <li *ngIf="emailInput.errors?.['required']">The email field is required.</li>
+          <li *ngIf="emailInput.errors?.['pattern']">It has to be an email address.</li>
+        </ul>
+
+        <label>Password</label>
+        <input type="password" placeholder="Password" name="password" [(ngModel)]="password" required minlength={{minPwdLength}} #passwordInput="ngModel">
+        <ul *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
+          <li *ngIf="passwordInput.errors?.['required']">The password field is required.</li>
+          <li *ngIf="passwordInput.errors?.['minlength']">It has to be at least 8 character long.</li>
+        </ul>
+
+        <label>Confirm password</label>
+        <input type="password" placeholder="Password" name="confirmPassword" [(ngModel)]="confirmPassword" required minlength={{minPwdLength}} #confirmPasswordInput="ngModel">
+        <ul *ngIf="confirmPasswordInput.invalid && (confirmPasswordInput.dirty || confirmPasswordInput.touched)">
+          <li *ngIf="confirmPasswordInput.errors?.['required']">The field is required.</li>
+          <li *ngIf="confirmPasswordInput.errors?.['minlength']">It has to be at least 8 character long.</li>
+        </ul>
+
       <button type="submit">Register</button>
   </form>
 </div>

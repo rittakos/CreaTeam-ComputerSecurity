@@ -1,0 +1,25 @@
+<div id="file-upload-container">
+    <h1>File uploading</h1>
+    <form (ngSubmit)="onUpload()">
+        <label>The file can be maximum 30MB.</label>
+        <label>File name</label>
+        <input placeholder="File name" name="fileName" [(ngModel)]="fileName"  required minlength={{minNameLength}} #nameInput="ngModel">
+        <ul *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+            <li *ngIf="nameInput.errors?.['required']">The name field is required.</li>
+            <li *ngIf="nameInput.errors?.['minlength']">It has to be at least 4 character long.</li>
+        </ul>
+
+        <label>Upload file from your device</label>
+        <input id="file-upload-input" type="file" (change)="onFileSelected($event)" style="display: none;" #fileInput accept=".caff">
+        <button id="file-select-btn" type="button" (click)="fileInput.click()">Select file</button>
+        <h2>Selected file: </h2>
+        <h2 id="uploading-file"></h2>
+
+        <label>Price of File</label>
+        <input disabled placeholder="0" type="number" name="price" [(ngModel)]="price">
+    
+
+        <button [disabled]="isDisabled" type="submit">Upload file</button>
+        <label id="bad-file-label" hidden>The file needs to be a CAFF file</label>
+    </form>
+</div>

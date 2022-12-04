@@ -13,6 +13,10 @@ export class RegisterComponent implements OnInit {
   password: string = '';
   confirmPassword: string = '';
 
+  emailPattern = "^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+  minNameLength = 4;
+  minPwdLength = 8;
+
   constructor(
     private readonly userService: UserService,
   ) { }
@@ -21,17 +25,17 @@ export class RegisterComponent implements OnInit {
   }
 
   onRegister() {
-    this.userService.register(this.name, this.username, this.email, this.password, this.confirmPassword).subscribe({
-      next: () => {
-        this.name = '';
-        this.username = '';
-        this.email = '';
-        this.password = '';
-        this.confirmPassword = '';
-        window.alert('Successful registration');
-      },
-      error: err => window.alert(err.error),
-    });
+     this.userService.register(this.name, this.username, this.email, this.password, this.confirmPassword).subscribe({
+       next: () => {
+           this.name = '';
+           this.username = '';
+           this.email = '';
+           this.password = '';
+           this.confirmPassword = '';
+         window.alert('Successful registration');
+       },
+       error: err => window.alert(err.error),
+     });
   }
 
 }

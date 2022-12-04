@@ -1,0 +1,23 @@
+#user-card {
+    margin: 20px;
+    background-color: rgb(240, 240, 240);
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    padding: 10px;
+}
+
+#user-card:hover {
+    background-color: rgb(216, 216, 216);
+}
+
+#overlay {
+    background-color: white;
+    border: solid 2px black;
+    margin: 70px auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    position: absolute;
+    top: 50px; left: 50px;
+    bottom: 50px; right: 50px;
+    transition: all 5s ease-in-out;
+}
