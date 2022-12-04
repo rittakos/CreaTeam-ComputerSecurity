@@ -2,7 +2,7 @@
 <search (submitSearch)="submitSearch($event)" ></search>
 </div>
 <product-list
-  *ngIf="products && images"
+  *ngIf="products && images.length == products.length"
   [products]="products"
   [images]="images"
 ></product-list>

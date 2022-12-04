@@ -12,9 +12,6 @@ export class ProductListComponent{
   @Input() images!: ProductImageData[];
 
   findImage(id: number): Blob {
-    // if((this.images.find(image => image.id == id))) {
-    //   return new Blob();
-    // }
     return this.images.find(image => image.id == id)!.image;
   }
 }

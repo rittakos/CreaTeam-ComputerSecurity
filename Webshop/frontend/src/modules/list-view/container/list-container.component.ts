@@ -35,7 +35,7 @@ export class ListContainerComponent implements OnInit {
   private loadImages(): void {
     this.products!.forEach(file => {
       this.fileService.getFilesPreview({id: file.id}).subscribe({
-        next: resp => this.images?.push({id: file.id, image: resp})
+        next: resp => this.images.push({id: file.id, image: resp})
       })
     })
   }

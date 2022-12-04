@@ -1,10 +1,12 @@
 <div class="card-grid">
   <ng-container *ngFor="let product of products">
-    <product-card
-      [product]="product"
-      [image]="findImage(product.id)"
-      [routerLink]="'/products/' + product.id"
-    ></product-card>
+    <ng-container *ngIf="images">
+      <product-card
+        [product]="product"
+        [image]="findImage(product.id)"
+        [routerLink]="'/products/' + product.id"
+      ></product-card>
+    </ng-container>
   </ng-container>
 </div>
 
