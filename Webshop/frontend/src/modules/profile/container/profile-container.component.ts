@@ -32,6 +32,7 @@ export class ProfileContainerComponent implements OnInit {
 
   private loadUserFiles(): void {
     this.userFiles = [];
+    this.otherFiles = [];
     this.fileService.getFilesSearch().subscribe({
       next: resp => {
         resp.forEach(file => {
