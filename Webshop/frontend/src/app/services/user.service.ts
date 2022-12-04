@@ -39,6 +39,7 @@ export class UserService {
 
       if (!this.isExpired(parsedTokens.accessToken)) {
         this.setTokens(parsedTokens);
+        this.setRoles(parsedTokens.accessToken);
       } else if (!this.isExpired(parsedTokens.refreshToken)) {
         this.refresh(parsedTokens.refreshToken);
       } else {

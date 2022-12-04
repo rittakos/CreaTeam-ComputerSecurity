@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from "@angular/core";
-import {CaffResponse} from "../../../../app/api/webshop/models/caff-response";
+import {FileData} from "../../../../interfaces/file-data.interface";
 
 @Component({
   selector: 'user-file',
@@ -7,7 +7,7 @@ import {CaffResponse} from "../../../../app/api/webshop/models/caff-response";
   styleUrls: ['user-file.component.scss']
 })
 export class UserFileComponent {
-  @Input() file!: CaffResponse;
+  @Input() file!: FileData;
   @Output() deleteFile = new EventEmitter<number>();
 
   onDeleteFile(): void {

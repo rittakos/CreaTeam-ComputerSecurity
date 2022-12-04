@@ -3,11 +3,22 @@
   <ng-container *ngIf="userData">
     <user-data [user]="userData"></user-data>
   </ng-container>
-  <ng-container *ngIf="userFiles">
-    <user-file-list
-      [files]="userFiles"
-      (deleteFile)="onFileDeleteSubmit($event)"
-    ></user-file-list>
-  </ng-container>
-
+  <div class="profile__file-lists">
+    <ng-container *ngIf="userFiles">
+      <user-file-list
+        [files]="userFiles"
+        [title]="'My uploads'"
+        (deleteFile)="onFileDeleteSubmit($event)"
+      ></user-file-list>
+    </ng-container>
+    <ng-container *ngIf="isAdmin">
+      <ng-container *ngIf="otherFiles">
+        <user-file-list
+          [files]="otherFiles"
+          [title]="'Other uploads'"
+          (deleteFile)="onFileDeleteSubmit($event)"
+        ></user-file-list>
+      </ng-container>
+    </ng-container>
+  </div>
 </div>
