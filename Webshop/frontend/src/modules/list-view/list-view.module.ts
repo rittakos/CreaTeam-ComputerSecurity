@@ -21,7 +21,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     CurrencyPipe,
     DatePipe,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   declarations: [
     ListContainerComponent,
