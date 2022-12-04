@@ -5,17 +5,14 @@
     <a [routerLink]="'/profile'" class="nav-button">My profile</a>
   </div>
   <div class="auth-buttons">
-    <button (click)="onLogout()">Log out!</button>
+    <a (click)="onLogout()" class="nav-button">Log out!</a>
   </div>
 </ng-container>
 
 <ng-template #loggedOut>
-  <div class="nav-buttons">
-    <a [routerLink]="['/']" class="nav-button">Home</a>
-  </div>
   <div class="auth-buttons">
-    <button>Log in</button>
-    <button>Register</button>
+    <a [routerLink]="'/auth'" class="nav-button">Log in</a>
+    <a [routerLink]="'/register'" class="nav-button">Register</a>
   </div>
 </ng-template>
 </nav>

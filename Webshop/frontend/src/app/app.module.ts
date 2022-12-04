@@ -10,7 +10,6 @@ import {AppComponent} from './app.component';
 import {AuthComponent} from './components/auth/auth.component';
 import {LoginComponent} from './components/auth/login/login.component';
 import {RegisterComponent} from './components/auth/register/register.component';
-import {HomeComponent} from './components/home/home.component';
 import {ListViewModule} from "../modules/list-view/list-view.module";
 import {MenuComponent} from "./components/menu/menu.component";
 
@@ -26,7 +25,6 @@ const API_INTERCEPTOR_PROVIDER: Provider = {
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent,
     MenuComponent
   ],
   imports: [
@@ -35,7 +33,6 @@ const API_INTERCEPTOR_PROVIDER: Provider = {
     FormsModule,
     HttpClientModule,
     ApiModule.forRoot({ rootUrl: '/api' }),
-
     ListViewModule
   ],
   providers: [
