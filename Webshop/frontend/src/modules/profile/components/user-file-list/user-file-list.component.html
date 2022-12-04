@@ -1,0 +1,11 @@
+<div class="files">
+  <div class="files__title">{{title}}</div>
+  <ng-container *ngFor="let file of files">
+    <hr>
+    <user-file
+      [file]="file"
+      (deleteFile)="onDeleteFileRequest($event)"
+    ></user-file>
+  </ng-container>
+
+</div>

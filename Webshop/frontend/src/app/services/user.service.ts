@@ -1,10 +1,12 @@
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable, ReplaySubject } from 'rxjs';
-import { LoginResponse, NewTokenResponse, UserDetailsResponse } from '../api/webshop/models';
-import { AuthService } from '../api/webshop/services';
+import {Injectable} from '@angular/core';
+import {Router} from '@angular/router';
+import {Observable, ReplaySubject} from 'rxjs';
+import {LoginResponse, NewTokenResponse, UserDetailsResponse} from '../api/webshop/models';
+import {AuthService} from '../api/webshop/services';
+import {UserData} from "../../interfaces/user-data.interface";
 
 const TOKEN_KEY = 'tokens';
+const USER_DATA_KEY = 'user-data';
 const ADMIN = 'ROLE_ADMIN';
 
 type TokenPayload = UserDetailsResponse & {
@@ -18,6 +20,7 @@ export class UserService {
   private tokens?: NewTokenResponse;
   private loggedIn: ReplaySubject<boolean> = new ReplaySubject();
   private admin: ReplaySubject<boolean> = new ReplaySubject();
+  private userDetails: ReplaySubject<UserData | undefined> = new ReplaySubject();
 
   constructor(
     private readonly router: Router,
@@ -25,6 +28,7 @@ export class UserService {
   ) {
     this.loggedIn.next(false);
     const tokens = localStorage.getItem(TOKEN_KEY);
+    const userData = localStorage.getItem(USER_DATA_KEY);
 
     if (tokens) {
       const parsedTokens = JSON.parse(tokens) as NewTokenResponse;
@@ -35,11 +39,20 @@ export class UserService {
 
       if (!this.isExpired(parsedTokens.accessToken)) {
         this.setTokens(parsedTokens);
+        this.setRoles(parsedTokens.accessToken);
       } else if (!this.isExpired(parsedTokens.refreshToken)) {
         this.refresh(parsedTokens.refreshToken);
       } else {
         this.logout();
       }
+    }
+
+    if(userData) {
+      const parsedUser = JSON.parse(userData) as UserData;
+      if(parsedUser) {
+        this.userDetails.next(parsedUser);
+      }
+
     }
   }
 
@@ -51,6 +64,12 @@ export class UserService {
         next: res => {
           this.setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
           this.setRoles(res.accessToken);
+          this.userDetails.next(res.userDetails);
+          localStorage.setItem(USER_DATA_KEY, JSON.stringify({
+            username: res.userDetails.username,
+            name: res.userDetails.name,
+            email: res.userDetails.email
+          }));
           this.router.navigate(['/']);
           subscriber.next(res);
         },
@@ -78,7 +97,9 @@ export class UserService {
   logout(): void {
     const refreshToken = this.tokens?.refreshToken;
     this.loggedIn.next(false);
+    this.userDetails.next(undefined);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_DATA_KEY);
     this.tokens = undefined;
     this.router.navigate(['/auth']);
 
@@ -129,6 +150,10 @@ export class UserService {
     const payload = this.getTokenPayload(token);
     const hasAdminRole = payload.roles.some(r => r === ADMIN);
     this.admin.next(hasAdminRole);
+  }
+
+  getUserDetails(): Observable<UserData | undefined> {
+    return this.userDetails.asObservable();
   }
 
 }

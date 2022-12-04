@@ -1,0 +1,21 @@
+<div *ngIf="product" class="page-container">
+  <div class="data-page">
+    <details-view
+      [product]="product"
+      [image]="image"
+    ></details-view>
+    <comments
+      [comments]="product.comments"
+      (submitComment)="onCommentSubmit($event)"
+    ></comments>
+  </div>
+  <sidebar
+    [purchased]="product.purchased"
+    [creator]="product.creator"
+    [uploadDate]="product.uploadDate"
+    [price]="product.price"
+    (buyEvent)="onBuyProduct()"
+    (downloadEvent)="onDownloadProduct()"
+  ></sidebar>
+</div>
+

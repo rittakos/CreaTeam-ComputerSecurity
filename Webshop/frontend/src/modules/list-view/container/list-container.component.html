@@ -1,0 +1,12 @@
+<div class="search-bar">
+  <search (submitSearch)="submitSearch($event)" ></search>
+</div>
+<product-list
+  *ngIf="(products && images.length == products.length); else loading"
+  [products]="products"
+  [images]="images"
+></product-list>
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>

@@ -1,0 +1,18 @@
+<nav class="nav-bar">
+<ng-container *ngIf="loggedIn; else loggedOut">
+  <div class="nav-buttons">
+    <a [routerLink]="['/']" class="nav-button">File browser</a>
+    <a [routerLink]="'/profile'" class="nav-button">My profile</a>
+  </div>
+  <div class="auth-buttons">
+    <a (click)="onLogout()" class="nav-button logout-button">Log out!</a>
+  </div>
+</ng-container>
+
+<ng-template #loggedOut>
+  <div class="auth-buttons">
+    <a [routerLink]="'/auth'" class="nav-button">Log in</a>
+    <a [routerLink]="'/register'" class="nav-button">Register</a>
+  </div>
+</ng-template>
+</nav>
