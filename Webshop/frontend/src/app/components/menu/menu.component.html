@@ -3,9 +3,11 @@
   <div class="nav-buttons">
     <a [routerLink]="['/']" class="nav-button">File browser</a>
     <a [routerLink]="'/profile'" class="nav-button">My profile</a>
+    <a [routerLink]="'/file-upload'" class="nav-button">Upload</a>
   </div>
   <div class="auth-buttons">
     <a (click)="onLogout()" class="nav-button logout-button">Log out!</a>
+    <a *ngIf="isAdmin" [routerLink]="'/admin'" class="nav-button">Admin panel</a>
   </div>
 </ng-container>
 

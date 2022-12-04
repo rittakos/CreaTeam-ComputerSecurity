@@ -8,6 +8,7 @@ import {UserService} from "../../services/user.service";
 })
 export class MenuComponent implements OnInit {
   loggedIn = false;
+  isAdmin: boolean = false;
 
   constructor(private readonly userService: UserService) { }
 
@@ -15,6 +16,9 @@ export class MenuComponent implements OnInit {
     this.userService.isLoggedIn().subscribe({
       next: resp => this.loggedIn = resp
     });
+    this.userService.isAdmin().subscribe({
+      next: resp => this.isAdmin = resp
+    })
   }
 
   onLogout(): void {
