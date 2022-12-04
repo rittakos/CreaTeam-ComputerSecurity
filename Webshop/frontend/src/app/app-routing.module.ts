@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'auth', component: AuthComponent, data: { requiresLogout: true, redirectTo: '/' }, canActivate: [ AccessGuard ], runGuardsAndResolvers: 'always' },
   { path: 'register', component: RegisterComponent, data: {reguiresLogout: true, redirectTo: '/'}, canActivate: [AccessGuard], runGuardsAndResolvers: 'always'},
   { path: 'file-upload', component: FileUploadComponent, data: {requiresLogin: true, redirectTo: '/auth'}, canActivate: [AccessGuard]},
-  { path: 'admin', component: AdminComponent, data: {requiresLogin: true, redirectTo: '/auth'}, canActivate: [AccessGuard]}
+  { path: 'admin', component: AdminComponent, data: {requiresAdmin: true, redirectTo: '/'}, canActivate: [AccessGuard]}
 ];
 
 @NgModule({

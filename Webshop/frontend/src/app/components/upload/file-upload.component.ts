@@ -57,9 +57,8 @@ export class FileUploadComponent {
         }
         else {
             badFileLabel?.removeAttribute("hidden");
+            this.isDisabled = true;
         }
-
-        console.log(this.selectedFileName.endsWith(".caff") );
 
 
     }
