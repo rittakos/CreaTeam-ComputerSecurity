@@ -3,6 +3,9 @@ package hu.bme.hit.vihima06.caffshop.backend.integration;
 import hu.bme.hit.vihima06.caffshop.backend.model.ERole;
 import hu.bme.hit.vihima06.caffshop.backend.model.Role;
 import hu.bme.hit.vihima06.caffshop.backend.model.User;
+import hu.bme.hit.vihima06.caffshop.backend.models.LoginRequest;
+import hu.bme.hit.vihima06.caffshop.backend.models.RefreshTokenRequest;
+import hu.bme.hit.vihima06.caffshop.backend.repository.RefreshTokenRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.RoleRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.util.AuthHelper;
@@ -21,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 import java.util.Set;
 
+import static hu.bme.hit.vihima06.caffshop.backend.util.TestHelper.asJsonString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,6 +41,9 @@ public class Auth {
     RoleRepository roleRepository;
 
     @Autowired
+    RefreshTokenRepository refreshTokenRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -45,7 +52,7 @@ public class Auth {
     final String ADMIN_USERNAME = "admin";
     final String ADMIN_EMAIL = "admin";
     final String ADMIN_NAME = "admin";
-    final String ADMIN_PASSWORD = "admin";
+    final String ADMIN_PASSWORD ="admin";
 
     final String USER_USERNAME = "user";
     final String USER_EMAIL = "user";
@@ -85,6 +92,7 @@ public class Auth {
 
     @AfterEach
     void tearDown() {
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
         roleRepository.deleteAll();
     }
@@ -94,17 +102,18 @@ public class Auth {
         RequestBuilder request = MockMvcRequestBuilders.post("/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + adminAccessToken);
+                .header("Authorization", "Bearer " + adminAccessToken)
+                .content(asJsonString(new RefreshTokenRequest().refreshToken("")));
 
         mockMvc.perform(request).andExpect(status().isNoContent());
     }
 
     @Test
     void login() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login")
+        RequestBuilder request = MockMvcRequestBuilders.post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + adminAccessToken);
+                .content(asJsonString(new LoginRequest().username(USER_USERNAME).password(USER_PASSWORD)));
 
         mockMvc.perform(request).andExpect(status().isOk());
     }

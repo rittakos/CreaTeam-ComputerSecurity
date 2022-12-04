@@ -3,6 +3,7 @@ package hu.bme.hit.vihima06.caffshop.backend.integration;
 import hu.bme.hit.vihima06.caffshop.backend.model.ERole;
 import hu.bme.hit.vihima06.caffshop.backend.model.Role;
 import hu.bme.hit.vihima06.caffshop.backend.model.User;
+import hu.bme.hit.vihima06.caffshop.backend.models.ModifyUserRequest;
 import hu.bme.hit.vihima06.caffshop.backend.repository.RoleRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.util.AuthHelper;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 import java.util.Set;
 
+import static hu.bme.hit.vihima06.caffshop.backend.util.TestHelper.asJsonString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -48,12 +50,13 @@ public class Admin {
     final String ADMIN_PASSWORD = "admin";
 
     final String USER_USERNAME = "user";
-    final String USER_EMAIL = "user";
+    final String USER_EMAIL = "user@asd.asd";
     final String USER_NAME = "user";
     final String USER_PASSWORD = "user";
 
     String adminAccessToken;
     String userAccessToken;
+    Integer userId;
 
     @BeforeEach
     void setup() {
@@ -78,6 +81,8 @@ public class Admin {
                 Set.of(userRole)
         );
         userRepository.save(user);
+
+        userId = user.getId();
 
         adminAccessToken = authHelper.getAccessToken(admin);
         userAccessToken = authHelper.getAccessToken(user);
@@ -111,12 +116,13 @@ public class Admin {
 
     @Test
     void adminModifyUser() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.put("/admin/modifyUser/1")
+        RequestBuilder request = MockMvcRequestBuilders.put("/admin/modifyUser/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + adminAccessToken);
+                .header("Authorization", "Bearer " + adminAccessToken)
+                .content(asJsonString(new ModifyUserRequest().name(USER_NAME).email(USER_EMAIL).roles(List.of(ERole.ROLE_USER.name(), ERole.ROLE_ADMIN.name()))));
 
-        mockMvc.perform(request).andExpect(status().isOk());
+        mockMvc.perform(request).andExpect(status().isAccepted());
     }
 
     @Test

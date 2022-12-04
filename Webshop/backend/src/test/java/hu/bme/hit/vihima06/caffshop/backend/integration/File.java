@@ -3,6 +3,7 @@ package hu.bme.hit.vihima06.caffshop.backend.integration;
 import hu.bme.hit.vihima06.caffshop.backend.model.ERole;
 import hu.bme.hit.vihima06.caffshop.backend.model.Role;
 import hu.bme.hit.vihima06.caffshop.backend.model.User;
+import hu.bme.hit.vihima06.caffshop.backend.models.FileUploadRequest;
 import hu.bme.hit.vihima06.caffshop.backend.repository.RoleRepository;
 import hu.bme.hit.vihima06.caffshop.backend.repository.UserRepository;
 import hu.bme.hit.vihima06.caffshop.backend.util.AuthHelper;
@@ -12,15 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.ResourceUtils;
 
 import java.util.List;
 import java.util.Set;
 
+import static hu.bme.hit.vihima06.caffshop.backend.util.TestHelper.asJsonString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -109,13 +113,4 @@ public class File {
         mockMvc.perform(request).andExpect(status().isOk());
     }
 
-    @Test
-    void upload() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.post("/files/upload")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + adminAccessToken);
-
-        mockMvc.perform(request).andExpect(status().isCreated());
-    }
 }
